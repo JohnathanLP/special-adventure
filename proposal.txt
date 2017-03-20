@@ -3,7 +3,23 @@ Haley Chambers
 Johnathan Powell
 
 Game Name:
+Canabalt
+(Infinite runner, much like Temple Run, but in a side-scroller format)
 
 Game Features:
+25 points - Gameplay: consists of pushing a single button to jump and avoid obstacles as your hero constantly runs to the right. We may also include quicktime events which require you to quickly key in a specific sequence, with score multipliers as a reward.
+10 points - Menuing: Not much to explain, high scores, etc.
+10 points - Reconfigurable Controls: Game will allow you to reconfigure your controls.
+15 points - Particle Effects: Dust trails as your hero runs/jumps/lands, snow/rain/wind particles, particles when you collide with an obstacle, etc. All tasteful.
+10 points - Animation: Hero will be animated, as well as some enemies and some simple background animations.
+5 points - Sound/Music: Will be the best.
+10 points - Server-Persisitant High Scores:
+15 points - Tile Rendering: Much of the levels will be randomly generated, and drawn with tile rendering.
+10 points - Collision Detection: Collision detection will be needed to implement gravity and jumping, as well as detecting when you hit enemies or obstacles.
+20 points - Procedural Level Generation: Levels will be randomly generated, with some testing to ensure that levels are possible and fair.
+20 points - Physics Integration: Physics integration may be implemented to  make obstacles and objects in the world behave more naturally.
+
+Total: 150 points
+Total for a team of two: 112.5
 
 Recommended Grading Criteria:
