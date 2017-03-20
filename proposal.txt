@@ -2,7 +2,7 @@ Team members:
 Haley Chambers
 Johnathan Powell
 
-Game Name:
+Game we are Implementing:
 Canabalt
 (Infinite runner, much like Temple Run, but in a side-scroller format)
 
