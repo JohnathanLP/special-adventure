@@ -1,0 +1,12 @@
+- Menus: same as breakout - Animated?
+  -New Game:
+  -High Scores:
+  -Credits:
+  -Options:
+    -Reconfigure controls
+
+-Game:
+  -Start with Desert:
+    -Needed:
+      -Art:
+        

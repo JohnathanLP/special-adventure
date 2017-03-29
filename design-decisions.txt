@@ -2,10 +2,12 @@ These are things we need to decide: I'm just writing them here to remember.
 
 1. Level themes: We should list different themes we would like to include, then specifically choose one or two to begin with, and make art for them so we can test.
   a. Generic grasslands: grass, rocks, blue sky, dust particles pretty simple.
-  b. Castle: darker stone corridors, torches, pillars, collumns, etc.
+  b. Castle: darker stone corridors, torches, pillars, columns, etc.
   c. Rainy grasslands: darker sky, clouds, rain particles, puddles, mud, etc.
   d. Forest: trees, fallen logs, rays of sunlight through trees, etc.
 
-2. Art style and character design: I think we are pretty set on pixel art, do you have a preference on resolution, color pallette, etc? Who is our character? Why is he/she running? Human or animal? Thoughts? We need to decide these before we can start drawing. Along with designing a character, we need to also name our game.
+2. Art style and character design: I think we are pretty set on pixel art, do you have a preference on resolution, color palette, etc? Who is our character? Why is he/she running? Human or animal? Thoughts? We need to decide these before we can start drawing. Along with designing a character, we need to also name our game.
 
 3. Camera stuff: I assume we want to move left to right, what are your thoughts on camera movement? Should we just move the camera horizontally, maintaining the character's x position, or should we do any kind of up and down movement?
+
+4. Responsibilities: What do you want to do? Is there something you specifically don't want to do?

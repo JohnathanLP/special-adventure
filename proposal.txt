@@ -17,7 +17,7 @@ Game Features:
 15 points - Tile Rendering: Much of the levels will be randomly generated, and drawn with tile rendering.
 10 points - Collision Detection: Collision detection will be needed to implement gravity and jumping, as well as detecting when you hit enemies or obstacles.
 20 points - Procedural Level Generation: Levels will be randomly generated, with some testing to ensure that levels are possible and fair.
-20 points - Physics Integration: Physics integration may be implemented to  make obstacles and objects in the world behave more naturally.
+20 points - Physics Integration: Physics integration may be implemented to make obstacles and objects in the world behave more naturally.
 
 Total: 150 points
 Total for a team of two: 112.5
