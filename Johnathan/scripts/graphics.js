@@ -82,6 +82,58 @@ let Graphics = (function(){
 		return that;
 	}
 
+  function Tile(spec){
+    var that = {};
+    var ready = false;
+    var image = new Image();
+
+    image.onload = function(){
+      ready = true;
+    };
+    image.src = spec.imageSource;
+
+    that.draw = function(xLoc, yLoc){
+      if(ready){
+        context.drawImage(
+          image,
+          spec.clip.x, spec.clip.y,
+          spec.clip.w, spec.clip.h,
+          xLoc, yLoc,
+          spec.clip.w, spec.clip.h);
+        context.restore();
+      }
+    }
+
+    that.setFrame = function(frame){
+      spec.clip.x = frame.x*32;
+      spec.clip.y = frame.y*32;
+    }
+
+    var timer = 0;
+    var lastTime = 0;
+
+    that.animate = function(elapsedTime){
+      if(!isNaN(elapsedTime)){
+        timer += (elapsedTime - lastTime);
+      }
+
+      if(timer > 75){
+        this.setFrame({x:0,y:1});
+      }
+      if(timer > 150){
+        this.setFrame({x:1,y:1});
+      }
+      if(timer > 225){
+        this.setFrame({x:2,y:1});
+        timer = 0;
+      }
+
+      lastTime = performance.now();
+    }
+
+    return that;
+  }
+
   function Sprite(spec){
     var that = {};
     var ready = false;
@@ -249,6 +301,7 @@ let Graphics = (function(){
     beginRender: beginRender,
     initialize: initialize,
     Sprite: Sprite,
+    Tile: Tile,
     Texture: Texture,
     Particle: Particle,
     Text: Text

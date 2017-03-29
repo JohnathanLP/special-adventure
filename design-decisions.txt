@@ -11,3 +11,6 @@ These are things we need to decide: I'm just writing them here to remember.
 3. Camera stuff: I assume we want to move left to right, what are your thoughts on camera movement? Should we just move the camera horizontally, maintaining the character's x position, or should we do any kind of up and down movement?
 
 4. Responsibilities: What do you want to do? Is there something you specifically don't want to do?
+
+Hero Names:
+Arabella - Means 'Eagle Warrior'

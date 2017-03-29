@@ -17,17 +17,14 @@ let myGame = (function(){
     rotation: 0
   });
 
-  let sandTile = Graphics.Texture({
-    imageSource: 'images/sand.png',
-    center: {x:0, y:0},
-    clip: {x:0, y:0, w:32, h:32},
-    width: 32,
-    height: 32,
-    rotation: 0
-  });
-
   let girl = Graphics.Sprite({
     imageSource: 'images/desert_girl.png',
+    position: {x:32, y:97},
+    clip: {x:0, y:0, w:32, h:32}
+  });
+
+  let sandTile = Graphics.Tile({
+    imageSource: 'images/sand_tiles.png',
     position: {x:32, y:97},
     clip: {x:0, y:0, w:32, h:32}
   });
@@ -49,8 +46,22 @@ let myGame = (function(){
   }
 
   function drawSand(){
+    var sel = Math.random()*3;
+    console.log(sel);
     for(var i=0; i<9; i++){
       sandTile.draw((32*i)-offset,128);
+      // if(sel < 1){
+      //   sandTile.setFrame({x:0,y:0});
+      //   sandTile.draw((32*i)-offset,128);
+      // }
+      // else if(sel < 2){
+      //   sandTile.setFrame({x:1,y:0});
+      //   sandTile.draw((32*i)-offset,128);
+      // }
+      // else if(sel < 3){
+      //   sandTile.setFrame({x:2,y:0});
+      //   sandTile.draw((32*i)-offset,128);
+      // }
     }
   }
 
@@ -62,7 +73,7 @@ let myGame = (function(){
   function render(){
     drawBackground();
     sun.draw(32,32);
-    girl.draw();
+    //girl.draw();
     drawSand();
   }
 
