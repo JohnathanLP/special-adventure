@@ -60,6 +60,7 @@ let sprite = Graphics.Texture({
 });
 
 var timer = 0;
+var loop = 0;
 var lastTime = 0;
 
 function animate(elapsedTime){
@@ -71,18 +72,37 @@ function animate(elapsedTime){
 
   Graphics.beginRender();
 
-  if(timer > 200){
-    sprite.setFrame({x:0,y:0});
+  loop++;
+  if(loop > 1500){
+    loop = 0;
   }
-  if(timer > 800){
-    sprite.setFrame({x:1,y:0});
+
+  if(loop < 1000){
+    if(timer > 100){
+      sprite.setFrame({x:0,y:1});
+    }
+    if(timer > 200){
+      sprite.setFrame({x:1,y:1});
+    }
+    if(timer > 300){
+      sprite.setFrame({x:2,y:1});
+      timer = 0;
+    }
   }
-  if(timer > 900){
-    sprite.setFrame({x:2,y:0});
-  }
-  if(timer > 1000){
-    sprite.setFrame({x:1,y:0});
-    timer = 0;
+  else{
+    if(timer > 200){
+      sprite.setFrame({x:0,y:0});
+    }
+    if(timer > 800){
+      sprite.setFrame({x:1,y:0});
+    }
+    if(timer > 900){
+      sprite.setFrame({x:2,y:0});
+    }
+    if(timer > 1000){
+      sprite.setFrame({x:1,y:0});
+      timer = 0;
+    }
   }
 
   sprite.draw();
