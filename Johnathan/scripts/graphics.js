@@ -118,13 +118,13 @@ let Graphics = (function(){
         timer += (elapsedTime - lastTime);
       }
 
-      if(timer > 100){
+      if(timer > 75){
         this.setFrame({x:0,y:1});
       }
-      if(timer > 200){
+      if(timer > 150){
         this.setFrame({x:1,y:1});
       }
-      if(timer > 300){
+      if(timer > 225){
         this.setFrame({x:2,y:1});
         timer = 0;
       }
