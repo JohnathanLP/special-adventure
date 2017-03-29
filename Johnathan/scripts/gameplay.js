@@ -26,11 +26,18 @@ let myGame = (function(){
     rotation: 0
   });
 
+  let girl = Graphics.Sprite({
+    imageSource: 'images/desert_girl.png',
+    position: {x:32, y:97},
+    clip: {x:0, y:0, w:32, h:32}
+  });
+
   var background_offset = 0;
   var offset = 0;
   var speed = 1;
 
   function update(elapsedTime){
+    girl.animate(elapsedTime);
     background_offset -= speed;
     if(background_offset < 0){
       background_offset = 512;
@@ -55,6 +62,7 @@ let myGame = (function(){
   function render(){
     drawBackground();
     sun.draw(32,32);
+    girl.draw();
     drawSand();
   }
 

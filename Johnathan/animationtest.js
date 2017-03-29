@@ -16,7 +16,7 @@ let Graphics = (function(){
     context.clear();
   }
 
-  function Texture(spec){
+  function Sprite(spec){
     var that = {};
     var ready = false;
     var image = new Image();
@@ -49,12 +49,12 @@ let Graphics = (function(){
 
   return{
     initialize: initialize,
-    Texture: Texture,
+    Sprite: Sprite,
     beginRender: beginRender
   }
 }());
 
-let sprite = Graphics.Texture({
+let sprite = Graphics.Sprite({
   imageSource: 'images/desert_girl.png',
   clip: {x:0, y:0, w:32, h:32}
 });
