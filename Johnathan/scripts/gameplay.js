@@ -23,11 +23,19 @@ let myGame = (function(){
     clip: {x:0, y:0, w:32, h:32}
   });
 
-  let sandTile = Graphics.Tile({
-    imageSource: 'images/sand_tiles.png',
-    position: {x:32, y:97},
-    clip: {x:0, y:0, w:32, h:32}
-  });
+  let sandTiles = [];
+  for(var i=0; i<9; i++){
+    let sel = Math.floor(Math.random()*9);
+    if(sel >= 3){
+      sel = 0;
+    }
+    let sandTile = Graphics.Tile({
+      imageSource: 'images/sand_tiles.png',
+      position: {x:32, y:97},
+      clip: {x:32*sel, y:0, w:32, h:32}
+    });
+    sandTiles.push(sandTile);
+  }
 
   var background_offset = 0;
   var offset = 0;
@@ -42,26 +50,24 @@ let myGame = (function(){
     offset += speed*2;
     if(offset >= 32){
       offset = 0;
+      let sel = Math.floor(Math.random()*9);
+      if(sel >= 3){
+        sel = 0;
+      }
+      let sandTile = Graphics.Tile({
+        imageSource: 'images/sand_tiles.png',
+        position: {x:32, y:97},
+        clip: {x:32*sel, y:0, w:32, h:32}
+      });
+      sandTiles.push(sandTile);
+      sandTiles.splice(0,1);
     }
   }
 
   function drawSand(){
-    var sel = Math.random()*3;
-    console.log(sel);
     for(var i=0; i<9; i++){
-      sandTile.draw((32*i)-offset,128);
-      // if(sel < 1){
-      //   sandTile.setFrame({x:0,y:0});
-      //   sandTile.draw((32*i)-offset,128);
-      // }
-      // else if(sel < 2){
-      //   sandTile.setFrame({x:1,y:0});
-      //   sandTile.draw((32*i)-offset,128);
-      // }
-      // else if(sel < 3){
-      //   sandTile.setFrame({x:2,y:0});
-      //   sandTile.draw((32*i)-offset,128);
-      // }
+      //sandTile.draw((32*i)-offset,128);
+      sandTiles[i].draw((32*i)-offset,128);
     }
   }
 

@@ -217,18 +217,6 @@ let Graphics = (function(){
       }
     }
 
-    that.moveRight = function(){
-      //console.log('move right');
-      myGame.screens['id-gameplay'].movePaddleRight();
-      //console.log('paddPos: ', myGame.screens['id-gameplay'].paddPos);
-    }
-
-    that.moveLeft = function(){
-      //console.log('move left');
-      myGame.screens['id-gameplay'].movePaddleLeft();
-      //console.log('paddPos: ', myGame.screens['id-gameplay'].paddPos);
-    }
-
     that.setClip = function(clipSpec){
       spec.clip.x = clipSpec.x;
       spec.clip.y = clipSpec.y;
