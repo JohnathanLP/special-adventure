@@ -1,8 +1,9 @@
-MyGame.screens['options'] = (function(game) {
+myGame.screens['high-scores'] = (function(game) {
 	'use strict';
 
 	function initialize() {
-		document.getElementById('id-options-back').addEventListener(
+		//myGame.persistence.report();
+		document.getElementById('id-high-scores-back').addEventListener(
 			'click',
 			function() { game.showScreen('main-menu'); });
 	}
@@ -14,4 +15,4 @@ MyGame.screens['options'] = (function(game) {
 		initialize : initialize,
 		run : run
 	};
-}(MyGame.game));
+}(myGame.game));

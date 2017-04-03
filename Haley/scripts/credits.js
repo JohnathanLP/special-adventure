@@ -1,4 +1,4 @@
-MyGame.screens['credits'] = (function(game) {
+myGame.screens['credits'] = (function(game) {
 	'use strict';
 
 	function initialize() {
@@ -14,4 +14,4 @@ MyGame.screens['credits'] = (function(game) {
 		initialize : initialize,
 		run : run
 	};
-}(MyGame.game));
+}(myGame.game));

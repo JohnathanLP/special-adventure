@@ -4,60 +4,93 @@
   <meta charset = "UTF-8">
   <title> HESPERIA: Land of the Setting Sun </title>
   <link rel = "stylesheet" type = "text/css" href = "hesperia.css">
+  <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
 </head>
-<body onload="myGame.initialize()">
+<body onload="myGame.game.initialize()">
 <div id = "game">
 
   <div id = "main-menu" class = "screen">
+
+    <div style="width: 50%; float: left;">
+
+    </div>
+        <div style="width: 50%; float: right;">
+          <h2>HESPERIA</h2>
       <section class="color-10">
-      <nav class="cl-effect-10">
-        <a href="#" data-hover="New Run"><span>New Run</span></a>
+      <nav class="cl-effect-21">
+        <a id = "id-new-game" href="#"><span>New Run</span></a>
         <br>
-        <a href="#" data-hover="Options"><span>Options</span></a>
+        <a id = "id-options" href="#"><span>Options</span></a>
         <br>
-        <a href="#" data-hover="High Scores"><span>High Scores</span></a>
+        <a id = "id-high-scores" href="#"><span>Scores</span></a>
         <br>
-        <a href="#" data-hover="Credits"><span>Credits</span></a>
+        <a id = "id-credits" href="#"><span>Credits</span></a>
         <br>
       </nav>
     </section>
+  </div>
 	</div>
 
   <div id="game-play" class="screen">
     <div style="width: 13%; float: left;">
-      <button id = "id-game-play-back">Back</button>
+      <section class="color-10">
+      <nav class="cl-effect-21">
+        <a id = "id-game-play-back" href="#" data-hover="New Run"><span>Back</span></a>
+      </nav>
+    </section>
     </div>
 
     <div style="width: 59%; float: left;">
-      <canvas id="id_canvas" width="256" height="160"
+      <canvas id="id-maincanvas" width="256" height="160"
         style="border:1px solid white; background-color: black;">
       </canvas>
     </div>
   </div>
 
   <div id = "high-scores" class = "screen" style="text-align:center;">
-		<h1> High Scores</h1>
+		<h2> High Scores</h2>
     <div id="highScoresList"></div>
-			<button id = "id-high-scores-back">Back to Menu</button>
-      <br>
-      <button id = "id-high-scores-back" onclick="Persistence.clearHighScores();">Clear High Scores</button>
-      <br>
-      <span id="clearedScores"></span>
+    <section class="color-10">
+      <nav class="cl-effect-21">
+        <a id = "id-clear-scores" href="#" onclick="Persistence.clearHighScores();"><span>Clear Scores</span></a>
+      </nav>
+    </section>
+      <section class="color-10">
+        <nav class="cl-effect-21">
+          <a id = "id-high-scores-back" href="#"><span>Back</span></a>
+        </nav>
+      </section>
 	</div>
 
   <div id = "options" class = "screen" style="text-align:center;">
-		<h1 >Options</h1>
+		<h2>Options</h2>
 		<p>Options exist here</p>
-		<button id = "id-options-back">Back to Menu</button>
+    <section class="color-10">
+      <nav class="cl-effect-21">
+        <a id = "id-options-back" href="#"><span>Back</span></a>
+      </nav>
+    </section>
 	</div>
 
 
   <div id = "credits" class = "screen" style="text-align:center;">
-		<h1 >Credits</h1>
-		<p>Yay game!</p>
-		<button id = "id-credits-back">Back to Menu</button>
+		<h2>Credits</h2>
+		<p>Hesperia was created by Johnathan Powell and Haley Chambers!</p>
+    <section class="color-10">
+      <nav class="cl-effect-21">
+        <a id = "id-credits-back" href="#"><span>Back</span></a>
+      </nav>
+    </section>
 	</div>
 </div>
 
+  <script src = "scripts/game.js"></script>
+  <script src = "scripts/mainmenu.js"></script>
+  <script src = "scripts/graphics.js"></script>
+  <script src = "scripts/gameplay.js"></script>
+  <script src = "scripts/random.js"></script>
+  <script src = "scripts/credits.js"></script>
+  <script src = "scripts/options.js"></script>
+  <script src = "scripts/highScores.js"></script>
 </body>
 </html>
