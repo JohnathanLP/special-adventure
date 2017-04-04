@@ -79,7 +79,7 @@ let myGame = (function(){
   function render(){
     drawBackground();
     sun.draw(32,32);
-    //girl.draw();
+    girl.draw();
     drawSand();
   }
 
