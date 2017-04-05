@@ -11,10 +11,11 @@ body, html {
   margin:0;
   background: url(images/title.gif) no-repeat center fixed;
   background-size: cover;
+  image-rendering: pixelated;
 }
 
 h2{
-  font-size: 300%;
+  font-size: 220%;
 }
 #game {
 	left: 0;
@@ -66,7 +67,7 @@ nav a {
 	letter-spacing: 3px;
 	font-weight: 400;
 	text-shadow: 0 0 1px rgba(255,255,255,0.3);
-	font-size: 1.85em;
+	font-size: 1.35em;
 }
 
 nav a:hover,
