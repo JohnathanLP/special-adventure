@@ -162,6 +162,10 @@ let Graphics = (function(){
       spec.clip.y = frame.y*32;
     }
 
+    that.jump = function(){
+      //updating spec.position.y for now
+    }
+
     var timer = 0;
     var lastTime = 0;
 
