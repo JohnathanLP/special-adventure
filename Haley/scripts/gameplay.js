@@ -72,6 +72,10 @@ myGame.screens['game-play'] = (function(game) {
     background.draw(background_offset-512,0);
   }
 
+  function processInput(elapsedTime) {
+		myKeyboard.update(elapsedTime);
+	}
+
   function render(){
     drawBackground();
     sun.draw(32,32);
@@ -80,6 +84,9 @@ myGame.screens['game-play'] = (function(game) {
   }
 
   function gameLoop(elapsedTime){
+    //Need to figure out how to loop
+    AudioPlayer.playSound('audio/desert');
+
     update(elapsedTime);
     render();
     if (!cancelNextRequest) {
@@ -96,6 +103,15 @@ myGame.screens['game-play'] = (function(game) {
 		});
 
     Graphics.initialize();
+    //initialize and play desert theme. Will handle castle later.
+    AudioPlayer.initialize();
+    //AudioPlayer.playSound('audio/desert');
+    //AudioPlayer.playSound('audio/castle');
+
+    //input nonsense
+    myKeyboard = input.Keyboard();
+    myKeyboard.registerCommand(KeyEvent.DOM_VK_J, girl.jump);
+    
     gameLoop();
   }
 
