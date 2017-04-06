@@ -82,58 +82,6 @@ let Graphics = (function(){
 		return that;
 	}
 
-  function Tile(spec){
-    var that = {};
-    var ready = false;
-    var image = new Image();
-
-    image.onload = function(){
-      ready = true;
-    };
-    image.src = spec.imageSource;
-
-    that.draw = function(xLoc, yLoc){
-      if(ready){
-        context.drawImage(
-          image,
-          spec.clip.x, spec.clip.y,
-          spec.clip.w, spec.clip.h,
-          xLoc, yLoc,
-          spec.clip.w, spec.clip.h);
-        context.restore();
-      }
-    }
-
-    that.setFrame = function(frame){
-      spec.clip.x = frame.x*32;
-      spec.clip.y = frame.y*32;
-    }
-
-    var timer = 0;
-    var lastTime = 0;
-
-    that.animate = function(elapsedTime){
-      if(!isNaN(elapsedTime)){
-        timer += (elapsedTime - lastTime);
-      }
-
-      if(timer > 75){
-        this.setFrame({x:0,y:1});
-      }
-      if(timer > 150){
-        this.setFrame({x:1,y:1});
-      }
-      if(timer > 225){
-        this.setFrame({x:2,y:1});
-        timer = 0;
-      }
-
-      lastTime = performance.now();
-    }
-
-    return that;
-  }
-
   function Sprite(spec){
     var that = {};
     var ready = false;
@@ -157,6 +105,18 @@ let Graphics = (function(){
       }
     }
 
+    that.drawTile = function(xLoc, yLoc){
+      if(ready){
+        context.drawImage(
+          image,
+          spec.clip.x, spec.clip.y,
+          spec.clip.w, spec.clip.h,
+          xLoc, yLoc,
+          spec.clip.w, spec.clip.h);
+        context.restore();
+      }
+    }
+
     that.setFrame = function(frame){
       spec.clip.x = frame.x*32;
       spec.clip.y = frame.y*32;
@@ -165,10 +125,13 @@ let Graphics = (function(){
     var timer = 0;
     var lastTime = 0;
 
-    that.animate = function(elapsedTime){
+    that.animate = function(elapsedTime, speed){
       if(!isNaN(elapsedTime)){
-        timer += (elapsedTime - lastTime);
+        //timer += (elapsedTime - lastTime);
+        timer += (elapsedTime*speed)/20;
       }
+
+      //console.log(timer);
 
       if(timer > 75){
         this.setFrame({x:0,y:1});
@@ -234,52 +197,56 @@ let Graphics = (function(){
   }
 
   function Particle(spec) {
-		var that = {};
+    var that = {};
 
-		spec.width = 1;
-		spec.height = 1;
-		spec.fill = 'rgba(255, 255, 255, 1)';
-		spec.alive = 0;
+    spec.width = 1;
+    spec.height = 1;
+    spec.fill = 'rgba(255, 255, 255, 1)';
+    spec.stroke = 'rgba(175, 175, 0, 1)';
+    spec.alive = 0;
 
-		that.update = function(elapsedTime) {
-			//
-			// We work with time in seconds, elapsedTime comes in as milliseconds
-			elapsedTime = elapsedTime / 1000;
-			//
-			// Update how long it has been alive
-			spec.alive += elapsedTime;
+    that.update = function(elapsedTime) {
+      //
+      // We work with time in seconds, elapsedTime comes in as milliseconds
+      elapsedTime = elapsedTime / 1000;
+      //
+      // Update how long it has been alive
+      spec.alive += elapsedTime;
 
-			//
-			// Update its position
-			spec.position.x += (elapsedTime * spec.speed * spec.direction.x);
-			spec.position.y += (elapsedTime * spec.speed * spec.direction.y);
+      //
+      // Update its position
+      spec.position.x += (elapsedTime * spec.speed * spec.direction.x);
+      spec.position.y += (elapsedTime * spec.speed * spec.direction.y);
+      if(spec.position.y > 128){
+        spec.direction.y *= -.5;
+      }
 
-			//
-			// Rotate proportional to its speed
-			spec.rotation += spec.speed / 500;
+      //
+      // Rotate proportional to its speed
+      //spec.rotation += spec.speed / 500;
 
-			//
-			// Return true if this particle is still alive
-			return (spec.alive < spec.lifetime);
-		};
+      //
+      // Return true if this particle is still alive
+      return (spec.alive < spec.lifetime);
+    };
 
-		that.draw = function() {
-			context.save();
-			context.translate(spec.position.x + spec.width / 2, spec.position.y + spec.height / 2);
-			context.rotate(spec.rotation);
-			context.translate(-(spec.position.x + spec.width / 2), -(spec.position.y + spec.height / 2));
+    that.draw = function() {
+      context.save();
+      context.translate(spec.position.x + spec.width / 2, spec.position.y + spec.height / 2);
+      context.rotate(spec.rotation);
+      context.translate(-(spec.position.x + spec.width / 2), -(spec.position.y + spec.height / 2));
 
-			context.fillStyle = spec.fill;
-			context.fillRect(spec.position.x, spec.position.y, spec.width, spec.height);
+      context.fillStyle = spec.fill;
+      context.fillRect(spec.position.x, spec.position.y, spec.width, spec.height);
 
-			context.strokeStyle = spec.stroke;
-			context.strokeRect(spec.position.x, spec.position.y, spec.width, spec.height);
+      context.strokeStyle = spec.stroke;
+      context.strokeRect(spec.position.x, spec.position.y, spec.width, spec.height);
 
-			context.restore();
-		};
+      context.restore();
+    };
 
-		return that;
-	}
+    return that;
+  }
 
   function beginRender(){
     context.clear();
@@ -289,7 +256,6 @@ let Graphics = (function(){
     beginRender: beginRender,
     initialize: initialize,
     Sprite: Sprite,
-    Tile: Tile,
     Texture: Texture,
     Particle: Particle,
     Text: Text
