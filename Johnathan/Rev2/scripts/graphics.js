@@ -74,7 +74,6 @@ let Graphics = (function(){
     var currentAnimation;
     var counter = 0;
     var frame = 0;
-    var animationSpeed = 1;
 
     image.onload = function(){
       ready = true;
@@ -124,9 +123,9 @@ let Graphics = (function(){
     }
 
     that.animate = function(elapsedTime, speed){
-      counter += (elapsedTime*animationSpeed);
+      counter += (elapsedTime*speed);
       //console.log(counter);
-      if(counter > animations[currentAnimation].delay[frame]/speed){
+      if(counter > (animations[currentAnimation].delay[frame]*25)/speed){
         counter = 0;
         frame++;
         if(frame >= animations[currentAnimation].frames){
@@ -136,9 +135,80 @@ let Graphics = (function(){
       that.setFrame({x:animations[currentAnimation].frameX[frame], y:animations[currentAnimation].frameY[frame]});
     }
 
-    that.setAnimationSpeed = function(spec){
-      if(spec > 0 && spec <= 10){
-        animationSpeed = spec;
+    return that;
+  }
+
+  function Particle(spec){
+    var that = {};
+
+    spec.alive = 0;
+
+    that.draw = function(spec){
+      context.save();
+      context.translate(spec.position.x + spec.width / 2, spec.position.y + spec.height / 2);
+      context.rotate(spec.rotation);
+      context.translate(-(spec.position.x + spec.width / 2), -(spec.position.y + spec.height / 2));
+
+      context.fillStyle = spec.fill;
+      context.fillRect(spec.position.x, spec.position.y, spec.width, spec.height);
+
+      context.strokeStyle = spec.stroke;
+      context.strokeRect(spec.position.x, spec.position.y, spec.width, spec.height);
+
+      context.restore();
+    }
+
+    that.update = function(elapsedTime) {
+      elapsedTime = elapsedTime / 1000;
+
+      spec.alive += elapsedTime;
+
+      spec.position.x += (elapsedTime * spec.speed * spec.direction.x);
+      spec.position.y += (elapsedTime * spec.speed * spec.direction.y);
+      if(spec.position.y > 128){
+        spec.direction.y *= -.5;
+      }
+
+      spec.rotation += spec.speed / 500;
+
+      return (spec.alive < spec.lifetime);
+    };
+
+    return that;
+  }
+
+  function ParticleSystem(){
+    var that = {};
+    var particles = [];
+
+    that.add = function(spec){
+      var p = Particle(spec);
+      console.log(spec.position.x, ',', spec.position.y);
+      particles.push(p);
+    }
+
+    that.update = function(elapsedTime){
+      var iter;
+      for (iter in particles){
+        particle[iter].update(elapsedTime);
+      }
+
+      var iter;
+  		var temp = [];
+
+  		temp.length = 0;
+  		for (iter in particles) {
+  			if (particles[iter].update(elapsedTime)) {
+  				temp.push(particles[iter]);
+  			}
+  		}
+  		particles = temp;
+    }
+
+    that.draw = function(){
+      var iter;
+      for (iter in particles){
+        particles[iter].draw();
       }
     }
 
@@ -149,6 +219,7 @@ let Graphics = (function(){
     initialize: initialize,
     beginRender: beginRender,
     Tile: Tile,
+    ParticleSystem: ParticleSystem,
     Sprite: Sprite
   };
 }());

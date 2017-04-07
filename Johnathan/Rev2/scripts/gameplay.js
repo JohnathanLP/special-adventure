@@ -1,10 +1,9 @@
 let myGame = (function(){
   //Primary Variables:
   var lastTimeStamp;
-  var speed = 15;
+  var speed = 25;
   var offset = 0;
-  var snap_flag = true;
-  var snapped_flag = false;
+  var background_offset = 0;
 
   //Tile and Sprite Creation
   let girl = Graphics.Sprite({
@@ -24,7 +23,7 @@ let myGame = (function(){
     frames: 3,
     frameX: [0,1,2],
     frameY: [0,0,0],
-    delay: [300,300,300]
+    delay: [8500,2500,8500]
   });
   girl.setAnimation('run');
 
@@ -36,8 +35,8 @@ let myGame = (function(){
 
   let sandTiles = [];
   for(var i=0; i<9; i++){
-    let sel = Math.floor(Math.random()*9);
-    if(sel >= 3){
+    let sel = Math.floor(Math.random()*15);
+    if(sel >= 4){
       sel = 0;
     }
     let sandTile = Graphics.Sprite({
@@ -48,11 +47,7 @@ let myGame = (function(){
     sandTiles.push(sandTile);
   }
 
-  let sand_tile = Graphics.Tile({
-    imageSource: 'images/sand_tiles.png',
-    position: {x:0, y:0},
-    clip: {x:0, y:0, w:32, h:32}
-  });
+  let sandstorm = Graphics.ParticleSystem();
 
   //Secondary Functions:
   function drawSand(){
@@ -62,16 +57,9 @@ let myGame = (function(){
   }
 
   function snapSandTiles(){
-    if(offset%32 > 18){
-      snap_flag = true;
-    }
-    if(offset%32 < 18 && snap_flag){
-      snapped_flag = false;
-    }
-    if(snap_flag && !snapped_flag){
-      //console.log('snap');
-      let sel = Math.floor(Math.random()*9);
-      if(sel >= 3){
+    if(offset > 32){
+      let sel = Math.floor(Math.random()*15);
+      if(sel >= 4){
         sel = 0;
       }
       let sandTile = Graphics.Sprite({
@@ -81,14 +69,13 @@ let myGame = (function(){
       });
       sandTiles.push(sandTile);
       sandTiles.splice(0,1);
-      snapped_flag = true;
-      snap_flag = false;
+      offset = 0
     }
   }
 
   function drawBackground(){
-    background.drawAbs(-offset/2,0);
-    background.drawAbs((-offset+512)/2,0);
+    background.drawAbs(-background_offset/2,0);
+    background.drawAbs((-background_offset+512)/2,0);
   }
 
   //Primary Functions:
@@ -106,6 +93,16 @@ let myGame = (function(){
     requestAnimationFrame(gameLoop);
   }
 
+  function addSandstormParticles(){
+    sandstorm.add({
+      position: {x: 50, y: 50},
+      direction: {x:1, y:1},
+      speed: 5,
+      rotation: 0,
+      lifetime: 300
+    });
+  }
+
   function update(elapsedTime){
     var time = 0;
     if(!isNaN(elapsedTime)){
@@ -114,21 +111,23 @@ let myGame = (function(){
     girl.animate(time, speed);
 
     offset += speed/time;
-
-    if(offset >= 512){
-      offset = 0;
+    background_offset += speed/time;
+    if(background_offset >= 512){
+      background_offset = 0;
     }
+
     snapSandTiles();
+    addSandstormParticles();
   }
 
   function render(){
     drawBackground();
     girl.drawCurr();
     drawSand();
+    //sandstorm.draw();
   }
 
   return{
-    initialize: initialize,
-    girl: girl
+    initialize: initialize
   };
 }());
