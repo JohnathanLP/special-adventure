@@ -86,7 +86,7 @@ myGame.screens['game-play'] = (function(game) {
   function gameLoop(elapsedTime){
     //Need to figure out how to loop
     AudioPlayer.playSound('audio/desert');
-
+    processInput(elapsedTime);
     update(elapsedTime);
     render();
     if (!cancelNextRequest) {
@@ -109,9 +109,9 @@ myGame.screens['game-play'] = (function(game) {
     //AudioPlayer.playSound('audio/castle');
 
     //input nonsense
-    myKeyboard = input.Keyboard();
+    myKeyboard = Input.Keyboard();
     myKeyboard.registerCommand(KeyEvent.DOM_VK_J, girl.jump);
-    
+
     gameLoop();
   }
 

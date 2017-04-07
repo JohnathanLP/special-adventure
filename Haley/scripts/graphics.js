@@ -164,6 +164,7 @@ let Graphics = (function(){
 
     that.jump = function(){
       //updating spec.position.y for now
+      console.log('JUMPED BOOOII');
     }
 
     var timer = 0;

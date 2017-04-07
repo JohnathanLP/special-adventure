@@ -17,6 +17,10 @@ body, html {
 h2{
   font-size: 220%;
 }
+
+#id-maincanvas {
+  width: 100%;
+}
 #game {
 	left: 0;
 	top: 0;
