@@ -60,6 +60,10 @@ h2{
 	text-align: center;
 }
 
+#id-maincanvas{
+  width: 100%;
+}
+
 nav a {
 	position: relative;
 	display: inline-block;

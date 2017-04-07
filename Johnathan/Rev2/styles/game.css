@@ -1,0 +1,8 @@
+#id-maincanvas{
+	image-rendering: pixelated;
+  width: 100%;
+}
+
+#id-canvasdiv{
+  border: solid;
+}

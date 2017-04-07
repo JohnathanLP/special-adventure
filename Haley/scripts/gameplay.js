@@ -108,9 +108,9 @@ myGame.screens['game-play'] = (function(game) {
     //AudioPlayer.playSound('audio/desert');
     //AudioPlayer.playSound('audio/castle');
 
-    //input nonsense
     myKeyboard = Input.Keyboard();
     myKeyboard.registerCommand(KeyEvent.DOM_VK_J, girl.jump);
+
 
     gameLoop();
   }
