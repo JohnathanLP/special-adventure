@@ -1,8 +1,8 @@
 let myGame = (function(){
   //Primary Variables:
   var lastTimeStamp;
-  var offset = 0;
   var speed = 15;
+  var offset = 0;
   var snap_flag = true;
   var snapped_flag = false;
 
@@ -17,7 +17,7 @@ let myGame = (function(){
     frames: 3,
     frameX: [0,1,2],
     frameY: [1,1,1],
-    delay: [1600,1600,1600]
+    delay: [1700,1700,1700]
   });
   girl.addAnimation({
     name: 'breathe',
