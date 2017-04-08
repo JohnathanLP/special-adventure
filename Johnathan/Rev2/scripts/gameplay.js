@@ -1,7 +1,7 @@
 let myGame = (function(){
   //Primary Variables:
   var lastTimeStamp;
-  var speed = 25;
+  var speed = 20;
   var offset = 0;
   var background_offset = 0;
 
@@ -78,6 +78,18 @@ let myGame = (function(){
     background.drawAbs((-background_offset+512)/2,0);
   }
 
+  function addSandstormParticles(){
+    for(var i=0; i<5; i++){
+      sandstorm.add({
+      position: {x: 256, y: (Math.random()*192)-64},
+      direction: {x:-5, y:1},
+      speed: speed,
+      rotation: 0,
+      lifetime: 4
+      });
+    }
+  }
+
   //Primary Functions:
   function initialize(){
     Graphics.initialize();
@@ -91,16 +103,6 @@ let myGame = (function(){
     lastTimeStamp = currTime;
     render();
     requestAnimationFrame(gameLoop);
-  }
-
-  function addSandstormParticles(){
-    sandstorm.add({
-      position: {x: 50, y: 50},
-      direction: {x:1, y:1},
-      speed: 5,
-      rotation: 0,
-      lifetime: 300
-    });
   }
 
   function update(elapsedTime){
@@ -117,6 +119,7 @@ let myGame = (function(){
     }
 
     snapSandTiles();
+    sandstorm.update(time);
     addSandstormParticles();
   }
 
@@ -124,7 +127,7 @@ let myGame = (function(){
     drawBackground();
     girl.drawCurr();
     drawSand();
-    //sandstorm.draw();
+    sandstorm.draw();
   }
 
   return{

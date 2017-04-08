@@ -141,9 +141,13 @@ let Graphics = (function(){
   function Particle(spec){
     var that = {};
 
+    spec.width = 1;
+    spec.height = 1;
+    spec.fill = 'rgba(255, 255, 255, 1)';
+    spec.stroke = 'rgba(175, 175, 0, 1)';
     spec.alive = 0;
 
-    that.draw = function(spec){
+    that.draw = function(){
       context.save();
       context.translate(spec.position.x + spec.width / 2, spec.position.y + spec.height / 2);
       context.rotate(spec.rotation);
@@ -162,11 +166,10 @@ let Graphics = (function(){
       elapsedTime = elapsedTime / 1000;
 
       spec.alive += elapsedTime;
-
       spec.position.x += (elapsedTime * spec.speed * spec.direction.x);
       spec.position.y += (elapsedTime * spec.speed * spec.direction.y);
-      if(spec.position.y > 128){
-        spec.direction.y *= -.5;
+      if(spec.position.y > 126){
+        spec.direction.y *= -.3;
       }
 
       spec.rotation += spec.speed / 500;
@@ -183,14 +186,13 @@ let Graphics = (function(){
 
     that.add = function(spec){
       var p = Particle(spec);
-      console.log(spec.position.x, ',', spec.position.y);
       particles.push(p);
     }
 
     that.update = function(elapsedTime){
       var iter;
       for (iter in particles){
-        particle[iter].update(elapsedTime);
+        particles[iter].update(elapsedTime);
       }
 
       var iter;
