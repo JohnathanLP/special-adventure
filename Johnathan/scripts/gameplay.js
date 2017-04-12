@@ -5,10 +5,8 @@ let myGame = (function(){
   var offset = 0;
   var background_offset = 0;
   var sandstorm_intensity = 1;
-  var girlVelY = 0;
-  var jumpDelay = 0;
-  var onGround = true;
   var girlPosX = 32;
+  var distance_run = 0;
 
   //Tile and Sprite Creation
   let girl = Graphics.Sprite({
@@ -59,6 +57,15 @@ let myGame = (function(){
     sandTiles.push(sandTile);
   }
 
+  let obstacles0 = [];
+  let obstacles1 = [];
+  let obstacles2 = [];
+  for(var i=0; i<9; i++){
+    obstacles0.push(null);
+    obstacles1.push(null);
+    obstacles2.push(null);
+  }
+
   let sandstorm = Graphics.ParticleSystem();
 
   //Secondary Functions:
@@ -81,7 +88,68 @@ let myGame = (function(){
       });
       sandTiles.push(sandTile);
       sandTiles.splice(0,1);
+      distance_run++;
       offset = 0
+    }
+  }
+
+  function drawObstacles(){
+    for(var i=0; i<obstacles0.length; i++){
+      if(obstacles0[i] != null){
+        obstacles0[i].drawAbs((i*32)-(offset%32),96);
+      }
+      if(obstacles1[i] != null){
+        obstacles1[i].drawAbs((i*32)-(offset%32),64);
+      }
+      if(obstacles2[i] != null){
+        obstacles2[i].drawAbs((i*32)-(offset%32),32);
+      }
+    }
+  }
+
+  function snapObstacles(obstaclesRow){
+    if(offset > 32){
+      let sel = Math.floor(Math.random()*15);
+      let obstacle = Graphics.Sprite({
+        imageSource: 'images/obstacles.png',
+        position: {x:32, y:64},
+        clip: {x:0, y:0, w:32, h:32}
+      });
+      if(sel == 0){
+        obstaclesRow.push(obstacle);
+      }
+      else {
+        obstaclesRow.push(null);
+      }
+      obstaclesRow.splice(0,1);
+    }
+  }
+
+  function addSupports(){
+    if(obstacles1[obstacles1.length-1] != null){
+      console.log('test');
+      let obstacle = Graphics.Sprite({
+        imageSource: 'images/obstacles.png',
+        position: {x:32, y:64},
+        clip: {x:32, y:0, w:32, h:32}
+      });
+      if(obstacles0[obstacles1.length-1] == null){
+        obstacles0[obstacles1.length-1] = obstacle;
+      }
+    }
+    if(obstacles2[obstacles2.length-1] != null){
+      console.log('test2');
+      let obstacle = Graphics.Sprite({
+        imageSource: 'images/obstacles.png',
+        position: {x:32, y:64},
+        clip: {x:32, y:0, w:32, h:32}
+      });
+      if(obstacles0[obstacles1.length-1] == null){
+        obstacles0[obstacles1.length-1] = obstacle;
+      }
+      if(obstacles1[obstacles1.length-1] == null){
+        obstacles1[obstacles1.length-1] = obstacle;
+      }
     }
   }
 
@@ -109,6 +177,7 @@ let myGame = (function(){
   //Primary Functions:
   function initialize(){
     Graphics.initialize();
+    distance_run = 0;
     gameLoop();
   }
 
@@ -128,38 +197,18 @@ let myGame = (function(){
     }
     girl.animate(time, speed);
 
-    if(girl.getY() >= 96 && onGround == false){
-      console.log('land');
-      girl.setPosition(girlPosX, 96);
-      onGround = true;
-      girlVelY = 0;
-      girl.setAnimation('run');
-    }
-    if(jumpDelay >= 1000){
-      console.log('jump');
-      onGround = false;
-      girlVelY = -3;
-      jumpDelay = 0;
-      girl.setAnimation('jump');
-    }
-
-    if(onGround == true){
-      jumpDelay += time;
-    }
-    else{
-      girlVelY += .1;
-    }
-
-    console.log(girl.getY());
-
-    girl.move(0, girlVelY);
-
     offset += speed/time;
     background_offset += speed/time;
     if(background_offset >= 512){
       background_offset = 0;
     }
 
+    //console.log(distance_run);
+
+    snapObstacles(obstacles0);
+    snapObstacles(obstacles1);
+    snapObstacles(obstacles2);
+    addSupports();
     snapSandTiles();
     sandstorm.update(time);
     addSandstormParticles();
@@ -167,6 +216,7 @@ let myGame = (function(){
 
   function render(){
     drawBackground();
+    drawObstacles();
     girl.drawCurr();
     drawSand();
     sandstorm.draw();
