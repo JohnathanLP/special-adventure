@@ -113,13 +113,26 @@ let Graphics = (function(){
     that.addAnimation = function(spec){
       //TODO - filter and check that animations are valid
       animations[spec.name] = spec;
-      console.log('Animation Registered');
     }
 
     //IMPORTANT! You have to set an animation! If you don't set at least one, it'll crash
     that.setAnimation = function(spec){
       currentAnimation = spec;
       counter = 0;
+    }
+
+    that.getY = function(){
+      return spec.position.y;
+    }
+
+    that.move = function(x,y){
+      spec.position.x += x;
+      spec.position.y += y;
+    }
+
+    that.setPosition = function(x,y){
+      spec.position.x = x;
+      spec.position.y = y;
     }
 
     that.animate = function(elapsedTime, speed){

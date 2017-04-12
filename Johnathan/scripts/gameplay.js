@@ -4,11 +4,16 @@ let myGame = (function(){
   var speed = 20;
   var offset = 0;
   var background_offset = 0;
+  var sandstorm_intensity = 1;
+  var girlVelY = 0;
+  var jumpDelay = 0;
+  var onGround = true;
+  var girlPosX = 32;
 
   //Tile and Sprite Creation
   let girl = Graphics.Sprite({
     imageSource: 'images/desert_girl.png',
-    position: {x:32, y:96},
+    position: {x:girlPosX, y:96},
     clip: {x:0, y:0, w:32, h:32}
   });
   girl.addAnimation({
@@ -24,6 +29,13 @@ let myGame = (function(){
     frameX: [0,1,2],
     frameY: [0,0,0],
     delay: [8500,2500,8500]
+  });
+  girl.addAnimation({
+    name: 'jump',
+    frames: 9,
+    frameX: [0,1,2, 0,1,2, 0,1,2],
+    frameY: [2,2,2, 3,3,3, 4,4,4],
+    delay: [2000,2000,1700, 500,500,1700, 1700,1700,1700]
   });
   girl.setAnimation('run');
 
@@ -79,7 +91,7 @@ let myGame = (function(){
   }
 
   function addSandstormParticles(){
-    for(var i=0; i<5; i++){
+    for(var i=0; i<sandstorm_intensity; i++){
       sandstorm.add({
       position: {x: 256, y: (Math.random()*192)-64},
       direction: {x:-5, y:.5},
@@ -115,6 +127,32 @@ let myGame = (function(){
       time = elapsedTime;
     }
     girl.animate(time, speed);
+
+    if(girl.getY() >= 96 && onGround == false){
+      console.log('land');
+      girl.setPosition(girlPosX, 96);
+      onGround = true;
+      girlVelY = 0;
+      girl.setAnimation('run');
+    }
+    if(jumpDelay >= 1000){
+      console.log('jump');
+      onGround = false;
+      girlVelY = -3;
+      jumpDelay = 0;
+      girl.setAnimation('jump');
+    }
+
+    if(onGround == true){
+      jumpDelay += time;
+    }
+    else{
+      girlVelY += .1;
+    }
+
+    console.log(girl.getY());
+
+    girl.move(0, girlVelY);
 
     offset += speed/time;
     background_offset += speed/time;
