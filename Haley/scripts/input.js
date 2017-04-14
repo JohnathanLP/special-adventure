@@ -23,7 +23,6 @@ let Input = (function(){
 			for (handler = 0; handler < that.handlers.length; handler++) {
 				if (that.keys.hasOwnProperty(that.handlers[handler].key)) {
 					that.handlers[handler].handler(elapsedTime);
-					console.log('updating');
 				}
 			}
 		};
