@@ -13,7 +13,7 @@ let Persistence = (function (){
 			controls['jump'] = value;
 			localStorage['myGame.controls'] = JSON.stringify(controls);
 
-			console.log("ADDED");
+			console.log("Added new control");
 			var keyBoardControls = Persistence.getControls();
 	    console.log(keyBoardControls.jump);
 		}

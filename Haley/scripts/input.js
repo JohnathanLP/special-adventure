@@ -1,6 +1,5 @@
 let Input = (function(){
 	function Keyboard() {
-		console.log('were here');
 		var that = {
 				keys : {},
 				handlers : []

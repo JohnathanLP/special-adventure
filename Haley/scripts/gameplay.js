@@ -4,6 +4,9 @@ myGame.screens['game-play'] = (function(game) {
   var speed = 20;
   var offset = 0;
   var background_offset = 0;
+  var sandstorm_intensity = 1;
+  var girlPosX = 32;
+  var distance_run = 0;
   var cancelNextRequest = false;
 
   //Tile and Sprite Creation
@@ -26,6 +29,13 @@ myGame.screens['game-play'] = (function(game) {
     frameY: [0,0,0],
     delay: [8500,2500,8500]
   });
+  girl.addAnimation({
+    name: 'jump',
+    frames: 9,
+    frameX: [0,1,2, 0,1,2, 0,1,2],
+    frameY: [2,2,2, 3,3,3, 4,4,4],
+    delay: [2000,2000,1700, 500,500,1700, 1700,1700,1700]
+  });
   girl.setAnimation('run');
 
   let background = Graphics.Tile({
@@ -46,6 +56,15 @@ myGame.screens['game-play'] = (function(game) {
       clip: {x:32*sel, y:0, w:32, h:32}
     });
     sandTiles.push(sandTile);
+  }
+
+  let obstacles0 = [];
+  let obstacles1 = [];
+  let obstacles2 = [];
+  for(var i=0; i<9; i++){
+    obstacles0.push(null);
+    obstacles1.push(null);
+    obstacles2.push(null);
   }
 
   let sandstorm = Graphics.ParticleSystem();
@@ -74,6 +93,66 @@ myGame.screens['game-play'] = (function(game) {
     }
   }
 
+  function drawObstacles(){
+    for(var i=0; i<obstacles0.length; i++){
+      if(obstacles0[i] != null){
+        obstacles0[i].drawAbs((i*32)-(offset%32),96);
+      }
+      if(obstacles1[i] != null){
+        obstacles1[i].drawAbs((i*32)-(offset%32),64);
+      }
+      if(obstacles2[i] != null){
+        obstacles2[i].drawAbs((i*32)-(offset%32),32);
+      }
+    }
+  }
+
+  function snapObstacles(obstaclesRow){
+    if(offset > 32){
+      let sel = Math.floor(Math.random()*15);
+      let obstacle = Graphics.Sprite({
+        imageSource: 'images/obstacles.png',
+        position: {x:32, y:64},
+        clip: {x:0, y:0, w:32, h:32}
+      });
+      if(sel == 0){
+        obstaclesRow.push(obstacle);
+      }
+      else {
+        obstaclesRow.push(null);
+      }
+      obstaclesRow.splice(0,1);
+    }
+  }
+
+  function addSupports(){
+    if(obstacles1[obstacles1.length-1] != null){
+      //console.log('test');
+      let obstacle = Graphics.Sprite({
+        imageSource: 'images/obstacles.png',
+        position: {x:32, y:64},
+        clip: {x:32, y:0, w:32, h:32}
+      });
+      if(obstacles0[obstacles1.length-1] == null){
+        obstacles0[obstacles1.length-1] = obstacle;
+      }
+    }
+    if(obstacles2[obstacles2.length-1] != null){
+      //console.log('test2');
+      let obstacle = Graphics.Sprite({
+        imageSource: 'images/obstacles.png',
+        position: {x:32, y:64},
+        clip: {x:32, y:0, w:32, h:32}
+      });
+      if(obstacles0[obstacles1.length-1] == null){
+        obstacles0[obstacles1.length-1] = obstacle;
+      }
+      if(obstacles1[obstacles1.length-1] == null){
+        obstacles1[obstacles1.length-1] = obstacle;
+      }
+    }
+  }
+
   function drawBackground(){
     background.drawAbs(-background_offset/2,0);
     background.drawAbs((-background_offset+512)/2,0);
@@ -99,24 +178,24 @@ myGame.screens['game-play'] = (function(game) {
 		myKeyboard.update(elapsedTime);
 	}
 
+  function jump(){
+    if(jumpTime){
+      girl.setAnimation('jump');
+      jumpTime = false;
+    }else{
+      girl.setAnimation('run');
+    }
 
-  function setUpInput(event){
-    var keyBoardControls = Persistence.getControls();
-    console.log(keyBoardControls);
-    // var value = event.keyCode;
-    // myKeyboard.registerCommand(value, girl.jump);
-    // document.getElementById("demo2").innerHTML = "The Unicode KEY code is: " + key;
+    //girl.setAnimation('run');
   }
-var testVal = true;
+
 
   //Primary Functions:
   function initialize(){
-    console.log("BAH");
 
     document.getElementById('id-game-play-back').addEventListener(
 		'click',
 		function() {
-      //THIS NEEDS TO BE FIXED
 			cancelNextRequest = true;
       game.showScreen('main-menu');
 		});
@@ -128,7 +207,6 @@ var testVal = true;
   }
 
   function gameLoop(currTime){
-    console.log("WOWOWOWOW");
     var elapsedTime = (currTime - lastTimeStamp);
     processInput(elapsedTime);
 
@@ -154,6 +232,10 @@ var testVal = true;
       background_offset = 0;
     }
 
+    snapObstacles(obstacles0);
+    snapObstacles(obstacles1);
+    snapObstacles(obstacles2);
+    addSupports();
     snapSandTiles();
     sandstorm.update(time);
     addSandstormParticles();
@@ -161,28 +243,30 @@ var testVal = true;
 
   function render(){
     drawBackground();
+    drawObstacles();
     girl.drawCurr();
     drawSand();
     sandstorm.draw();
   }
-  //This needs to happen at the start of every new run
+
   function run(){
     cancelNextRequest = false;
-    AudioPlayer.playSound('audio/desert');
+    distance_run = 0;
+    //AudioPlayer.playSound('audio/desert');
 
     myKeyboard = Input.Keyboard();
     var keyBoardControls = Persistence.getControls();
     console.log(keyBoardControls);
+
     if(keyBoardControls == null){
-      myKeyboard.registerCommand(74, girl.jump);
+      myKeyboard.registerCommand(74, girl.setAnimation('jump'));
       console.log("registered");
     }else{
       var jumpKey = keyBoardControls.jump;
-      myKeyboard.registerCommand(jumpKey, girl.jump);
+      myKeyboard.registerCommand(jumpKey, jump);
     }
-    //console.log(keyBoardControls);
-		requestAnimationFrame(gameLoop);
 
+		requestAnimationFrame(gameLoop);
   }
 
   return{
