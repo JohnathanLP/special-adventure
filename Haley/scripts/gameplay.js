@@ -8,6 +8,9 @@ myGame.screens['game-play'] = (function(game) {
   var girlPosX = 32;
   var distance_run = 0;
   var cancelNextRequest = false;
+  var girlVelY = 0;
+  var onGround = true;
+  var terrH = 96;
 
   //Tile and Sprite Creation
   let girl = Graphics.Sprite({
@@ -32,9 +35,9 @@ myGame.screens['game-play'] = (function(game) {
   girl.addAnimation({
     name: 'jump',
     frames: 9,
-    frameX: [0,1,2, 0,1,2, 0,1,2],
-    frameY: [2,2,2, 3,3,3, 4,4,4],
-    delay: [2000,2000,1700, 500,500,1700, 1700,1700,1700]
+    frameX: [0,1,2, 0,1,2, 0,1,0],
+    frameY: [2,2,2, 3,3,3, 4,4,2],
+    delay: [2000,1800,1600, 700,700,700, 1000,3000,3000]
   });
   girl.setAnimation('run');
 
@@ -178,12 +181,24 @@ myGame.screens['game-play'] = (function(game) {
 		myKeyboard.update(elapsedTime);
 	}
 
-  function jump(){
-      girl.setAnimation('jump');
-
-    //girl.setAnimation('run');
+  function handleJump(){
+    girl.move(0,girlVelY)
+    girlVelY += 0.1;
+    if(girl.getY() >= terrH){
+      girlVelY = 0;
+      girl.setPosition(girlPosX, terrH);
+      onGround = true;
+      girl.setAnimation('run');
+    }
   }
 
+  function jump(){
+    if(onGround){
+      girl.setAnimation('jump');
+      onGround = false;
+      girlVelY = -3;
+    }
+  }
 
   //Primary Functions:
   function initialize(){
@@ -220,6 +235,9 @@ myGame.screens['game-play'] = (function(game) {
       time = elapsedTime;
     }
     girl.animate(time, speed);
+    if(!onGround){
+      handleJump();
+    }
 
     offset += speed/time;
     background_offset += speed/time;
