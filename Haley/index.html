@@ -10,6 +10,21 @@
     AudioPlayer.updateVolume(level);
   }
   </script>
+
+  <script type="text/javascript">
+    function detectkeys(e){
+      var evtobj=window.event? event : e
+      var character = String.fromCharCode(evtobj.which);
+
+      var text = document.getElementById('jumpKeyCode').innerHTML;
+    	text = "<p>You have chosen the ";
+    	text += character;
+      text +=" key to jump!</p>";
+    	document.getElementById('jumpKeyCode').innerHTML = text;
+    }
+
+
+</script>
 </head>
 <body onload="myGame.game.initialize()">
 
@@ -73,8 +88,8 @@
 
   <div id = "options" class = "screen" style="text-align:center;">
 		<h3>Reconfigure Controls</h3>
-      <p>JUMP key:<input type="text" size="10" maxlength="1" onkeydown="Persistence.add(event.keyCode)" name="jumpKeyCode"><br></p>
-        <p><span id="demo2"></span></p>
+      <p>JUMP key:<input type="text" size="10" maxlength="1" onkeypress="detectkeys()" onkeydown="Persistence.add(event.keyCode)" name="jumpKeyCode"><br></p>
+        <p><span id="jumpKeyCode"></span></p>
 
     <section class="color-10">
       <nav class="cl-effect-21">

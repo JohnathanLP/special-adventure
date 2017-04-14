@@ -179,12 +179,7 @@ myGame.screens['game-play'] = (function(game) {
 	}
 
   function jump(){
-    if(jumpTime){
       girl.setAnimation('jump');
-      jumpTime = false;
-    }else{
-      girl.setAnimation('run');
-    }
 
     //girl.setAnimation('run');
   }
@@ -249,19 +244,31 @@ myGame.screens['game-play'] = (function(game) {
     sandstorm.draw();
   }
 
+  function isEmpty(obj) {
+    for(var key in obj) {
+        if(obj.hasOwnProperty(key))
+            return false;
+    }
+    return true;
+  }
+
   function run(){
     cancelNextRequest = false;
     distance_run = 0;
+    //Comment this back in. I just got tired of it playing.
     //AudioPlayer.playSound('audio/desert');
 
     myKeyboard = Input.Keyboard();
     var keyBoardControls = Persistence.getControls();
     console.log(keyBoardControls);
 
-    if(keyBoardControls == null){
-      myKeyboard.registerCommand(74, girl.setAnimation('jump'));
-      console.log("registered");
+    if(isEmpty(keyBoardControls)){
+      Persistence.add(74);
+      myKeyboard.registerCommand(74, jump);
+      var keyBoardControls = Persistence.getControls();
+      console.log(keyBoardControls);
     }else{
+      console.log("we have something");
       var jumpKey = keyBoardControls.jump;
       myKeyboard.registerCommand(jumpKey, jump);
     }

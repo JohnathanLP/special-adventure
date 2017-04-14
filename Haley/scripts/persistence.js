@@ -4,28 +4,31 @@ let Persistence = (function (){
 		//this is only going to take event.keyCode (value)
 		function add(value) {
 			localStorage.clear();
-      var controls = {},
-  			previousControls = localStorage.getItem('myGame.controls');
-  		if (previousControls !== null) {
-  			controls = JSON.parse(previousControls);
-  		}
-
-			controls['jump'] = value;
-			localStorage['myGame.controls'] = JSON.stringify(controls);
-
-			console.log("Added new control");
+			var controls = {},
+				previousControls = localStorage.getItem('myGame.controls');
+			if (previousControls !== null) {
+				controls = JSON.parse(previousControls);
+			}
+			//Backspace key
+			if(value != 8){
+				controls['jump'] = value;
+				localStorage['myGame.controls'] = JSON.stringify(controls);
+			}else{
+				//Default back to 74
+				//controls['jump'] = 74;
+				//localStorage['myGame.controls'] = JSON.stringify(controls);
+			}
+			//THESE ARE FOR TESTING
 			var keyBoardControls = Persistence.getControls();
-	    console.log(keyBoardControls.jump);
+	    console.log(keyBoardControls);
 		}
 
-		//THIS STILL NEEDS TO GET REWRITTEN. Need some way to return the controls
 		function getControls() {
       var controls = {},
   			previousControls = localStorage.getItem('myGame.controls');
   		if (previousControls !== null) {
   			controls = JSON.parse(previousControls);
   		}
-			//eh?
 			return controls;
 		}
 
