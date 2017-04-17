@@ -41,7 +41,7 @@ myGame.screens['game-play'] = (function(game) {
   });
   girl.setAnimation('run');
 
-  let background = Graphics.Tile({
+  let background = Graphics.Background({
     imageSource: 'images/desert_background.png',
     position: {x:0, y:0},
     clip: {x:0, y:0, w:512, h:128}
@@ -75,12 +75,14 @@ myGame.screens['game-play'] = (function(game) {
   //Secondary Functions:
   function drawSand(){
     for(var i=0; i<sandTiles.length; i++){
-      sandTiles[i].drawAbs((i*32)-(offset%32),128);
+      sandTiles[i].setPosition((i*32)-(offset%32),128);
+      sandTiles[i].draw();
     }
   }
 
   function snapSandTiles(){
     if(offset > 32){
+      distance_run++;
       let sel = Math.floor(Math.random()*15);
       if(sel >= 4){
         sel = 0;
@@ -99,20 +101,23 @@ myGame.screens['game-play'] = (function(game) {
   function drawObstacles(){
     for(var i=0; i<obstacles0.length; i++){
       if(obstacles0[i] != null){
-        obstacles0[i].drawAbs((i*32)-(offset%32),96);
+        obstacles0[i].setPosition((i*32)-(offset%32),96);
+        obstacles0[i].draw();
       }
       if(obstacles1[i] != null){
-        obstacles1[i].drawAbs((i*32)-(offset%32),64);
+        obstacles1[i].setPosition((i*32)-(offset%32),64);
+        obstacles1[i].draw();
       }
       if(obstacles2[i] != null){
-        obstacles2[i].drawAbs((i*32)-(offset%32),32);
+        obstacles2[i].setPosition((i*32)-(offset%32),32);
+        obstacles2[i].draw();
       }
     }
   }
 
   function snapObstacles(obstaclesRow){
     if(offset > 32){
-      let sel = Math.floor(Math.random()*15);
+      let sel = Math.floor(Math.random()*5);
       let obstacle = Graphics.Sprite({
         imageSource: 'images/obstacles.png',
         position: {x:32, y:64},
@@ -128,6 +133,7 @@ myGame.screens['game-play'] = (function(game) {
     }
   }
 
+  //TODO replace this
   function addSupports(){
     if(obstacles1[obstacles1.length-1] != null){
       //console.log('test');
@@ -157,8 +163,10 @@ myGame.screens['game-play'] = (function(game) {
   }
 
   function drawBackground(){
-    background.drawAbs(-background_offset/2,0);
-    background.drawAbs((-background_offset+512)/2,0);
+    background.setPosition(-background_offset/2,0);
+    background.draw();
+    background.setPosition((-background_offset+512)/2,0);
+    background.draw();
   }
 
   function addSandstormParticles(){
@@ -181,9 +189,9 @@ myGame.screens['game-play'] = (function(game) {
 		myKeyboard.update(elapsedTime);
 	}
 
-  function handleJump(){
+  function handleGravity(){
     girl.move(0,girlVelY)
-    girlVelY += 0.1;
+    girlVelY += .1;
     if(girl.getY() >= terrH){
       girlVelY = 0;
       girl.setPosition(girlPosX, terrH);
@@ -197,6 +205,23 @@ myGame.screens['game-play'] = (function(game) {
       girl.setAnimation('jump');
       onGround = false;
       girlVelY = -3;
+    }
+  }
+
+  function getAltitude(){
+    if(obstacles2[2] != null){
+      //console.log(0);
+      return 0;
+    }else if(obstacles1[2] != null){
+      //console.log(32);
+      return 32;
+    }else if(obstacles0[2] != null){
+      //console.log(64);
+      return 64;
+    }
+    else{
+      //console.log(96);
+      return 96;
     }
   }
 
@@ -235,10 +260,15 @@ myGame.screens['game-play'] = (function(game) {
       time = elapsedTime;
     }
     girl.animate(time, speed);
+
+    if(girl.getY() < terrH){
+      onGround = false;
+    }
     if(!onGround){
-      handleJump();
+      handleGravity();
     }
 
+    terrH = getAltitude();
     offset += speed/time;
     background_offset += speed/time;
     if(background_offset >= 512){
@@ -246,8 +276,8 @@ myGame.screens['game-play'] = (function(game) {
     }
 
     snapObstacles(obstacles0);
-    snapObstacles(obstacles1);
-    snapObstacles(obstacles2);
+    //snapObstacles(obstacles1);
+    //snapObstacles(obstacles2);
     addSupports();
     snapSandTiles();
     sandstorm.update(time);
@@ -257,7 +287,7 @@ myGame.screens['game-play'] = (function(game) {
   function render(){
     drawBackground();
     drawObstacles();
-    girl.drawCurr();
+    girl.draw();
     drawSand();
     sandstorm.draw();
   }
@@ -273,7 +303,7 @@ myGame.screens['game-play'] = (function(game) {
   function run(){
     cancelNextRequest = false;
     distance_run = 0;
-    //Comment this back in. I just got tired of it playing.
+    //TODO Comment this back in. I just got tired of it playing.
     //AudioPlayer.playSound('audio/desert');
 
     myKeyboard = Input.Keyboard();
