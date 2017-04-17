@@ -16,7 +16,43 @@ let Graphics = (function(){
     context.clear();
   }
 
-  //Does not have animations
+  //TODO cleanup background code, remove extra tile stuff
+  function Background(spec){
+    var that = {};
+    var ready = false;
+    var image = new Image();
+    var animations = [];
+    var currentAnimation;
+    var counter = 0;
+    var frame = 0;
+    var animationSpeed = 1;
+
+    image.onload = function(){
+      ready = true;
+    };
+    image.src = spec.imageSource;
+
+    that.draw = function(){
+      if(ready){
+        context.save();
+        context.drawImage(
+          image,
+          spec.clip.x, spec.clip.y,
+          spec.clip.w, spec.clip.h,
+          spec.position.x,spec.position.y,
+          spec.clip.w, spec.clip.h);
+        context.restore();
+      }
+    }
+
+    that.setPosition = function(x,y){
+      spec.position.x = x;
+      spec.position.y = y;
+    }
+    return that;
+  }
+
+  //Does not have animations, locked to grid
   function Tile(spec){
     var that = {};
     var ready = false;
@@ -32,19 +68,7 @@ let Graphics = (function(){
     };
     image.src = spec.imageSource;
 
-    that.drawAbs = function(xLoc, yLoc){
-      if(ready){
-        context.drawImage(
-          image,
-          spec.clip.x, spec.clip.y,
-          spec.clip.w, spec.clip.h,
-          xLoc, yLoc,
-          spec.clip.w, spec.clip.h);
-        context.restore();
-      }
-    }
-
-    that.drawCurr = function(){
+    that.draw = function(){
       if(ready){
         context.save();
         context.drawImage(
@@ -57,6 +81,11 @@ let Graphics = (function(){
       }
     }
 
+    that.setPosition = function(x,y){
+      spec.position.x = x;
+      spec.position.y = y;
+    }
+
     that.setFrame = function(frame){
       spec.clip.x = frame.x*32;
       spec.clip.y = frame.y*32;
@@ -65,7 +94,7 @@ let Graphics = (function(){
     return that;
   }
 
-  //Has animations
+  //Has animations, moves freely in grid
   function Sprite(spec){
     var that = {};
     var ready = false;
@@ -80,19 +109,7 @@ let Graphics = (function(){
     };
     image.src = spec.imageSource;
 
-    that.drawAbs = function(xLoc, yLoc){
-      if(ready){
-        context.drawImage(
-          image,
-          spec.clip.x, spec.clip.y,
-          spec.clip.w, spec.clip.h,
-          xLoc, yLoc,
-          spec.clip.w, spec.clip.h);
-        context.restore();
-      }
-    }
-
-    that.drawCurr = function(){
+    that.draw = function(){
       if(ready){
         context.save();
         context.drawImage(
@@ -235,6 +252,7 @@ let Graphics = (function(){
   return{
     initialize: initialize,
     beginRender: beginRender,
+    Background: Background,
     Tile: Tile,
     ParticleSystem: ParticleSystem,
     Sprite: Sprite

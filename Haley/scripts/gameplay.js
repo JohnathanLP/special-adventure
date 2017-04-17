@@ -16,7 +16,8 @@ myGame.screens['game-play'] = (function(game) {
   let girl = Graphics.Sprite({
     imageSource: 'images/desert_girl.png',
     position: {x:32, y:96},
-    clip: {x:0, y:0, w:32, h:32}
+    clip: {x:0, y:0, w:32, h:32},
+    hitbox: {x:2, y:2, w:27, h:32}
   });
   girl.addAnimation({
     name: 'run',
@@ -61,13 +62,12 @@ myGame.screens['game-play'] = (function(game) {
     sandTiles.push(sandTile);
   }
 
-  let obstacles0 = [];
-  let obstacles1 = [];
-  let obstacles2 = [];
+  let obstacles = [];
+  obstacles.push([]);
+  //obstacles.push([]);
   for(var i=0; i<9; i++){
-    obstacles0.push(null);
-    obstacles1.push(null);
-    obstacles2.push(null);
+    obstacles[0].push(null);
+    //obstacles[1].push(null);
   }
 
   let sandstorm = Graphics.ParticleSystem();
@@ -99,65 +99,32 @@ myGame.screens['game-play'] = (function(game) {
   }
 
   function drawObstacles(){
-    for(var i=0; i<obstacles0.length; i++){
-      if(obstacles0[i] != null){
-        obstacles0[i].setPosition((i*32)-(offset%32),96);
-        obstacles0[i].draw();
-      }
-      if(obstacles1[i] != null){
-        obstacles1[i].setPosition((i*32)-(offset%32),64);
-        obstacles1[i].draw();
-      }
-      if(obstacles2[i] != null){
-        obstacles2[i].setPosition((i*32)-(offset%32),32);
-        obstacles2[i].draw();
+    for(var j=0; j<obstacles.length; j++){
+      for(var i=0; i<obstacles[j].length; i++){
+        if(obstacles[j][i] != null){
+          obstacles[j][i].setPosition((i*32)-(offset%32),96-(32*j));
+          obstacles[j][i].draw();
+        }
       }
     }
   }
 
-  function snapObstacles(obstaclesRow){
+  function snapObstacles(){
     if(offset > 32){
-      let sel = Math.floor(Math.random()*5);
-      let obstacle = Graphics.Sprite({
-        imageSource: 'images/obstacles.png',
-        position: {x:32, y:64},
-        clip: {x:0, y:0, w:32, h:32}
-      });
-      if(sel == 0){
-        obstaclesRow.push(obstacle);
-      }
-      else {
-        obstaclesRow.push(null);
-      }
-      obstaclesRow.splice(0,1);
-    }
-  }
-
-  //TODO replace this
-  function addSupports(){
-    if(obstacles1[obstacles1.length-1] != null){
-      //console.log('test');
-      let obstacle = Graphics.Sprite({
-        imageSource: 'images/obstacles.png',
-        position: {x:32, y:64},
-        clip: {x:32, y:0, w:32, h:32}
-      });
-      if(obstacles0[obstacles1.length-1] == null){
-        obstacles0[obstacles1.length-1] = obstacle;
-      }
-    }
-    if(obstacles2[obstacles2.length-1] != null){
-      //console.log('test2');
-      let obstacle = Graphics.Sprite({
-        imageSource: 'images/obstacles.png',
-        position: {x:32, y:64},
-        clip: {x:32, y:0, w:32, h:32}
-      });
-      if(obstacles0[obstacles1.length-1] == null){
-        obstacles0[obstacles1.length-1] = obstacle;
-      }
-      if(obstacles1[obstacles1.length-1] == null){
-        obstacles1[obstacles1.length-1] = obstacle;
+      for(var i=0; i<obstacles.length; i++){
+        let sel = Math.floor(Math.random()*5);
+        let obstacle = Graphics.Sprite({
+          imageSource: 'images/obstacles.png',
+          position: {x:32, y:64},
+          clip: {x:0, y:0, w:32, h:32}
+        });
+        if(sel == 0){
+          obstacles[i].push(obstacle);
+        }
+        else {
+          obstacles[i].push(null);
+        }
+        obstacles[i].splice(0,1);
       }
     }
   }
@@ -209,13 +176,7 @@ myGame.screens['game-play'] = (function(game) {
   }
 
   function getAltitude(){
-    if(obstacles2[2] != null){
-      //console.log(0);
-      return 0;
-    }else if(obstacles1[2] != null){
-      //console.log(32);
-      return 32;
-    }else if(obstacles0[2] != null){
+    if(obstacles[0][2] != null){
       //console.log(64);
       return 64;
     }
@@ -275,10 +236,7 @@ myGame.screens['game-play'] = (function(game) {
       background_offset = 0;
     }
 
-    snapObstacles(obstacles0);
-    //snapObstacles(obstacles1);
-    //snapObstacles(obstacles2);
-    addSupports();
+    snapObstacles();
     snapSandTiles();
     sandstorm.update(time);
     addSandstormParticles();
