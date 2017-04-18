@@ -48,7 +48,10 @@ myGame.screens['game-play'] = (function(game) {
     clip: {x:0, y:0, w:512, h:128}
   });
 
-  let sandTiles = [];
+  //tiles array, holds sand and tiles[1]
+  let tiles = [];
+  //add sand row
+  tiles.push([]);
   for(var i=0; i<9; i++){
     let sel = Math.floor(Math.random()*15);
     if(sel >= 4){
@@ -59,73 +62,64 @@ myGame.screens['game-play'] = (function(game) {
       position: {x:32, y:97},
       clip: {x:32*sel, y:0, w:32, h:32}
     });
-    sandTiles.push(sandTile);
+    tiles[0].push(sandTile);
   }
-
-  let obstacles = [];
-  obstacles.push([]);
-  //obstacles.push([]);
+  console.log(tiles);
+  //add first obstacle row
+  tiles.push([]);
   for(var i=0; i<9; i++){
-    obstacles[0].push(null);
-    //obstacles[1].push(null);
+    tiles[1].push(null);
   }
 
   let sandstorm = Graphics.ParticleSystem();
 
   //Secondary Functions:
-  function drawSand(){
-    for(var i=0; i<sandTiles.length; i++){
-      sandTiles[i].setPosition((i*32)-(offset%32),128);
-      sandTiles[i].draw();
+  function drawTiles(){
+    for(var i=0; i<tiles.length; i++){
+      for(var j=0; j<tiles[i].length; j++){
+        if(tiles[i][j] != null){
+          tiles[i][j].setPosition((j*32)-offset, 128-(32*i));
+          tiles[i][j].draw();
+        }else{
+        }
+      }
     }
   }
 
-  function snapSandTiles(){
+  function pushTiles(){
     if(offset > 32){
       distance_run++;
-      let sel = Math.floor(Math.random()*15);
-      if(sel >= 4){
-        sel = 0;
-      }
-      let sandTile = Graphics.Sprite({
-        imageSource: 'images/sand_tiles.png',
-        position: {x:32, y:97},
-        clip: {x:32*sel, y:0, w:32, h:32}
-      });
-      sandTiles.push(sandTile);
-      sandTiles.splice(0,1);
-      offset = 0
-    }
-  }
-
-  function drawObstacles(){
-    for(var j=0; j<obstacles.length; j++){
-      for(var i=0; i<obstacles[j].length; i++){
-        if(obstacles[j][i] != null){
-          obstacles[j][i].setPosition((i*32)-(offset%32),96-(32*j));
-          obstacles[j][i].draw();
+      for(var i=0; i<tiles.length; i++){
+        //sand tiles
+        if(i == 0){
+          let sel = Math.floor(Math.random()*15);
+          if(sel >= 4){
+            sel = 0;
+          }
+          let tile = Graphics.Sprite({
+            imageSource: 'images/sand_tiles.png',
+            position: {x:32, y:97},
+            clip: {x:32*sel, y:0, w:32, h:32}
+          });
+          tiles[i].push(tile);
         }
-      }
-    }
-  }
-
-  function snapObstacles(){
-    if(offset > 32){
-      for(var i=0; i<obstacles.length; i++){
-        let sel = Math.floor(Math.random()*5);
-        let obstacle = Graphics.Sprite({
-          imageSource: 'images/obstacles.png',
-          position: {x:32, y:64},
-          clip: {x:0, y:0, w:32, h:32}
-        });
-        if(sel == 0){
-          obstacles[i].push(obstacle);
+        //obstacle tiles
+        else{
+          let sel = Math.floor(Math.random()*5);
+          if(sel == 1){
+            let tile = Graphics.Sprite({
+              imageSource: 'images/obstacles.png',
+              position: {x:32, y:64},
+              clip: {x:0, y:0, w:32, h:32}
+            });
+            tiles[i].push(tile);
+          }else{
+            tiles[i].push(null);
+          }
         }
-        else {
-          obstacles[i].push(null);
-        }
-        obstacles[i].splice(0,1);
+        tiles[i].splice(0,1);
       }
+      offset = 0;
     }
   }
 
@@ -159,7 +153,7 @@ myGame.screens['game-play'] = (function(game) {
   function handleGravity(){
     girl.move(0,girlVelY)
     girlVelY += .1;
-    if(girl.getY() >= terrH){
+    if(girl.getHitboxBounds().b >= terrH){
       girlVelY = 0;
       girl.setPosition(girlPosX, terrH);
       onGround = true;
@@ -176,14 +170,20 @@ myGame.screens['game-play'] = (function(game) {
   }
 
   function getAltitude(){
-    if(obstacles[0][2] != null){
-      //console.log(64);
+    if(tiles[1][2] != null){
       return 64;
     }
     else{
-      //console.log(96);
       return 96;
     }
+  }
+
+  function isEmpty(obj) {
+    for(var key in obj) {
+        if(obj.hasOwnProperty(key))
+            return false;
+    }
+    return true;
   }
 
   //Primary Functions:
@@ -198,8 +198,6 @@ myGame.screens['game-play'] = (function(game) {
 
     Graphics.initialize();
     AudioPlayer.initialize();
-
-    //gameLoop();
   }
 
   function gameLoop(currTime){
@@ -236,26 +234,16 @@ myGame.screens['game-play'] = (function(game) {
       background_offset = 0;
     }
 
-    snapObstacles();
-    snapSandTiles();
+    pushTiles();
     sandstorm.update(time);
     addSandstormParticles();
   }
 
   function render(){
     drawBackground();
-    drawObstacles();
     girl.draw();
-    drawSand();
+    drawTiles();
     sandstorm.draw();
-  }
-
-  function isEmpty(obj) {
-    for(var key in obj) {
-        if(obj.hasOwnProperty(key))
-            return false;
-    }
-    return true;
   }
 
   function run(){
