@@ -123,6 +123,38 @@ myGame.screens['game-play'] = (function(game) {
     }
   }
 
+  function testCollision(spec){
+    //spec includes a hitbox, a distance and a direction. Tests the grid in
+    //direction for distance to see if the hitbox will collide with anything.
+    //Returns the minimum of the distance given and the distance to the closest
+    //obstacle.
+    if(spec.direction == 'down'){
+      var l = convertToGrid({x:spec.hitbox.l, y:spec.hitbox.b});
+      var r = convertToGrid({x:spec.hitbox.r, y:spec.hitbox.b});
+      //console.log(r);
+      var distOut = spec.distance;
+      for(var i=l.x; i<=r.x; i++){
+        console.log(Math.floor(spec.distance/32));
+        for(var j=0; j<=Math.floor(spec.distance/32); j++){
+          if(tiles[i][4-l.y+j] != null){
+            if(tiles[i][4-l.y+j].getHitboxBounds().t < spec.hitbox.b+distOut){
+              distOut = tiles[i][4-l.y+j].getHitboxBounds().t;
+              console.log('object is closer!');
+            }
+          }
+        }
+      }
+      return distOut;
+    }
+  }
+
+  function convertToGrid(spec){
+    return{
+      x: Math.floor((spec.x-offset)/32),
+      y: Math.floor(spec.y/32)
+    }
+  }
+
   function drawBackground(){
     background.setPosition(-background_offset/2,0);
     background.draw();
@@ -151,14 +183,18 @@ myGame.screens['game-play'] = (function(game) {
 	}
 
   function handleGravity(){
-    girl.move(0,girlVelY)
     girlVelY += .1;
-    if(girl.getHitboxBounds().b >= terrH){
-      girlVelY = 0;
-      girl.setPosition(girlPosX, terrH);
-      onGround = true;
-      girl.setAnimation('run');
+    if(girlVelY > 0){
+      girlVelY = testCollision({hitbox: girl.getHitboxBounds(), distance: girlVelY, direction: 'down'});
     }
+    //console.log(girlVelY);
+    girl.move(0,girlVelY)
+    // if(girl.getHitboxBounds().b >= terrH){
+    //   girlVelY = 0;
+    //   girl.setPosition(girlPosX, terrH);
+    //   onGround = true;
+    //   girl.setAnimation('run');
+    // }
   }
 
   function jump(){
