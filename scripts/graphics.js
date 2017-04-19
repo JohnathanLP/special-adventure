@@ -91,6 +91,15 @@ let Graphics = (function(){
       spec.clip.y = frame.y*32;
     }
 
+    that.getHitboxBounds = function(){
+      return {
+        l:spec.position.x,
+        r:spec.position.x + spec.clip.w,
+        t:spec.position.y,
+        b:spec.position.y + spec.clip.h
+      }
+    }
+
     return that;
   }
 
@@ -138,6 +147,15 @@ let Graphics = (function(){
 
     that.getY = function(){
       return spec.position.y;
+    }
+
+    that.getHitboxBounds = function(){
+      return {
+        l:spec.position.x + spec.hitbox.x,
+        r:spec.position.x + spec.hitbox.x + spec.hitbox.w,
+        t:spec.position.y + spec.hitbox.y,
+        b:spec.position.y + spec.hitbox.y + spec.hitbox.h
+      }
     }
 
     that.setPosition = function(x,y){
