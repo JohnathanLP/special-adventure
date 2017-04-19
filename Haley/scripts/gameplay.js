@@ -36,7 +36,7 @@ myGame.screens['game-play'] = (function(game) {
     frameY: [2,2,2, 3,3,3, 4,4,4],
     delay: [2000,2000,1700, 500,500,1700, 1700,1700,1700]
   });
-  girl.setAnimation('run');
+  //girl.setAnimation('run');
 
   let background = Graphics.Tile({
     imageSource: 'images/desert_background.png',
@@ -202,6 +202,7 @@ myGame.screens['game-play'] = (function(game) {
   }
 
   function gameLoop(currTime){
+    console.log('ERE');
     var elapsedTime = (currTime - lastTimeStamp);
     processInput(elapsedTime);
 
@@ -253,11 +254,12 @@ myGame.screens['game-play'] = (function(game) {
   }
 
   function run(){
+    console.log('whats going on?');
     cancelNextRequest = false;
     distance_run = 0;
     //Comment this back in. I just got tired of it playing.
     //AudioPlayer.playSound('audio/desert');
-
+    girl.setAnimation('run');
     myKeyboard = Input.Keyboard();
     var keyBoardControls = Persistence.getControls();
     console.log(keyBoardControls);
