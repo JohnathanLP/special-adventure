@@ -1,23 +1,29 @@
 myGame.screens['game-play'] = (function(game) {
   //Primary Variables:
   var lastTimeStamp;
-  var speed = 20;
+  var speed = 30;
   var offset = 0;
   var background_offset = 0;
   var sandstorm_intensity = 1;
   var girlPosX = 32;
   var distance_run = 0;
   var cancelNextRequest = false;
-  var girlVelY = 0;
+  var girlVel = {x:0,y:0};
   var onGround = true;
   var terrH = 96;
+  var crashFlag = false;
+  var freeze = false;
+  var day = 0;
+  var dayTime = 0;
+  var dayDur = 1000;
+  var darkness = 0;
 
   //Tile and Sprite Creation
   let girl = Graphics.Sprite({
     imageSource: 'images/desert_girl.png',
     position: {x:32, y:96},
     clip: {x:0, y:0, w:32, h:32},
-    hitbox: {x:2, y:2, w:27, h:32}
+    hitbox: {x:19, y:2, w:15, h:30}
   });
   girl.addAnimation({
     name: 'run',
@@ -38,14 +44,35 @@ myGame.screens['game-play'] = (function(game) {
     frames: 9,
     frameX: [0,1,2, 0,1,2, 0,1,0],
     frameY: [2,2,2, 3,3,3, 4,4,2],
-    delay: [2000,1800,1600, 700,700,700, 1000,3000,3000]
+    delay: [2400,2200,2000, 900,900,900, 1700,3400,3400]
   });
   girl.setAnimation('run');
 
-  let background = Graphics.Background({
-    imageSource: 'images/desert_background.png',
+  let backgroundTop = Graphics.Background({
+    imageSource: 'images/desert_background_top.png',
     position: {x:0, y:0},
     clip: {x:0, y:0, w:512, h:128}
+  });
+  let backgroundBot = Graphics.Background({
+    imageSource: 'images/desert_background_bottom.png',
+    position: {x:0, y:0},
+    clip: {x:0, y:0, w:512, h:128}
+  });
+
+  let nightShader = Graphics.Shader({
+      corner: { x: 0, y: 0 },
+      size: { w: 256, h: 160 },
+      r: 10,
+      g: 0,
+      b: 0,
+      a: 0
+  });
+
+  let sun = Graphics.Sprite({
+    imageSource: 'images/sun.png',
+    position: {x:32, y:32},
+    clip: {x:0, y:0, w:20, h:20},
+    hitbox: {x:0, y:0, w:20, h:20}
   });
 
   //tiles array, holds sand and tiles[1]
@@ -57,7 +84,7 @@ myGame.screens['game-play'] = (function(game) {
     if(sel >= 4){
       sel = 0;
     }
-    let sandTile = Graphics.Sprite({
+    let sandTile = Graphics.Tile({
       imageSource: 'images/sand_tiles.png',
       position: {x:32, y:97},
       clip: {x:32*sel, y:0, w:32, h:32}
@@ -80,15 +107,17 @@ myGame.screens['game-play'] = (function(game) {
         if(tiles[i][j] != null){
           tiles[i][j].setPosition((j*32)-offset, 128-(32*i));
           tiles[i][j].draw();
-        }else{
         }
       }
     }
   }
 
   function pushTiles(){
+    //TODO clean up/improve procedural generation
     if(offset > 32){
       distance_run++;
+      console.log(distance_run);
+      speed += .01;
       for(var i=0; i<tiles.length; i++){
         //sand tiles
         if(i == 0){
@@ -96,7 +125,7 @@ myGame.screens['game-play'] = (function(game) {
           if(sel >= 4){
             sel = 0;
           }
-          let tile = Graphics.Sprite({
+          let tile = Graphics.Tile({
             imageSource: 'images/sand_tiles.png',
             position: {x:32, y:97},
             clip: {x:32*sel, y:0, w:32, h:32}
@@ -107,7 +136,7 @@ myGame.screens['game-play'] = (function(game) {
         else{
           let sel = Math.floor(Math.random()*5);
           if(sel == 1){
-            let tile = Graphics.Sprite({
+            let tile = Graphics.Tile({
               imageSource: 'images/obstacles.png',
               position: {x:32, y:64},
               clip: {x:0, y:0, w:32, h:32}
@@ -123,11 +152,46 @@ myGame.screens['game-play'] = (function(game) {
     }
   }
 
+  function rectangleCollision(a,b){
+    if(a.l<b.r && a.r>b.l && a.t<b.b && a.b>b.t && a.t<b.b){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+
+  function testCrash(){
+    let right = Math.floor((girl.getHitboxBounds().r-offset)/32);
+    let safeFlag = true;
+    for(var i=1; i<tiles.length; i++){
+      if(tiles[i][right] != null){
+        let girlHB = girl.getHitboxBounds();
+        girlHB.b -= 5;
+        if(rectangleCollision(girlHB, tiles[i][right].getHitboxBounds()) && !crashFlag){
+          speed -= .5;
+          //console.log(speed);
+          safeFlag = false;
+          crashFlag = true;
+        }
+      }
+    }
+    if(safeFlag){
+      crashFlag = false;
+    }
+    //console.log(crashFlag);
+  }
+
   function drawBackground(){
-    background.setPosition(-background_offset/2,0);
-    background.draw();
-    background.setPosition((-background_offset+512)/2,0);
-    background.draw();
+    backgroundTop.setPosition(-background_offset/2,0);
+    backgroundTop.draw();
+    backgroundTop.setPosition((-background_offset/2)+512,0);
+    backgroundTop.draw();
+    sun.draw();
+    backgroundBot.setPosition(-background_offset/2,0);
+    backgroundBot.draw();
+    backgroundBot.setPosition((-background_offset/2)+512,0);
+    backgroundBot.draw();
   }
 
   function addSandstormParticles(){
@@ -135,9 +199,9 @@ myGame.screens['game-play'] = (function(game) {
       sandstorm.add({
       position: {x: 256, y: (Math.random()*192)-64},
       direction: {x:-5, y:.5},
-      speed: speed,
+      speed: speed+(Math.random()*10)-5,
       rotation: 0,
-      lifetime: 4,
+      lifetime: 120/speed,
       width: 1,
       height: 1,
       fill: 'rgba(0, 0, 0, 1)',
@@ -151,21 +215,41 @@ myGame.screens['game-play'] = (function(game) {
 	}
 
   function handleGravity(){
-    girl.move(0,girlVelY)
-    girlVelY += .1;
-    if(girl.getHitboxBounds().b >= terrH){
-      girlVelY = 0;
-      girl.setPosition(girlPosX, terrH);
-      onGround = true;
-      girl.setAnimation('run');
+    girlVel.y += .1;
+    if(girlVel.y > 0){
+      //iterate left to right all cells that intersect the bottom edge of the hitbox
+      let left = Math.floor((girl.getHitboxBounds().l-offset)/32);
+      let right = Math.floor((girl.getHitboxBounds().r-offset)/32);
+      let bottom = 4-Math.floor(girl.getHitboxBounds().b/32);
+      let flag = false;
+      if(bottom>=0 && bottom < tiles.length){
+        for(var i=left; i<=right+1; i++){
+          if(tiles[bottom][i] != null){
+            if(rectangleCollision(girl.getHitboxBounds(),tiles[bottom][i].getHitboxBounds())){
+              girl.setPosition(girlPosX,tiles[bottom][i].getHitboxBounds().t-32);
+              girl.setAnimation('run');
+              onGround = true;
+              flag = true;
+              girlVel.y = 0;
+            }
+          }
+        }
+      }
+      if(!flag){
+        onGround = false;
+      }
     }
+    if(girlVel.y < 0){
+      //TODO collide with tiles above
+    }
+    girl.move(girlVel.x,girlVel.y)
   }
 
   function jump(){
     if(onGround){
       girl.setAnimation('jump');
       onGround = false;
-      girlVelY = -3;
+      girlVel.y = -3.5;
     }
   }
 
@@ -188,7 +272,6 @@ myGame.screens['game-play'] = (function(game) {
 
   //Primary Functions:
   function initialize(){
-
     document.getElementById('id-game-play-back').addEventListener(
 		'click',
 		function() {
@@ -219,6 +302,17 @@ myGame.screens['game-play'] = (function(game) {
       time = elapsedTime;
     }
     girl.animate(time, speed);
+    testCrash();
+
+    let right = Math.floor((girl.getHitboxBounds().r-offset)/32);
+    for(var i=1; i<tiles.length; i++){
+      if(tiles[i][right] != null){
+        if(girl.getHitboxBounds().r > tiles[i][right].getHitboxBounds().l && girl.getHitboxBounds().b > tiles[i][right].getHitboxBounds().t){
+          //TODO clean up collision detection and decriment speed
+          //console.log('crash');
+        }
+      }
+    }
 
     if(girl.getY() < terrH){
       onGround = false;
@@ -230,20 +324,31 @@ myGame.screens['game-play'] = (function(game) {
     terrH = getAltitude();
     offset += speed/time;
     background_offset += speed/time;
-    if(background_offset >= 512){
+    if(background_offset >= 1024){
       background_offset = 0;
     }
 
     pushTiles();
     sandstorm.update(time);
     addSandstormParticles();
+
+    //game over
+    if(speed <= 0){
+      speed = 0;
+      console.log('game over');
+    }
+    dayTime += time/100;
+    sun.move(0,(65/dayDur)*(time/100));
+    darkness += .0001;
+    nightShader.setA(darkness);
   }
 
   function render(){
     drawBackground();
-    girl.draw();
     drawTiles();
+    girl.draw();
     sandstorm.draw();
+    nightShader.draw();
   }
 
   function run(){
