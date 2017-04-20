@@ -267,12 +267,35 @@ let Graphics = (function(){
     return that;
   }
 
+  function Shader(spec) {
+      let that = {};
+
+      that.setA = function(aIn){
+        spec.a = aIn;
+      }
+
+      that.draw = function() {
+          context.save();
+
+          context.fillStyle = ('rgba(' + spec.r + ',' + spec.g + ',' + spec.b + ',' + spec.a + ')');
+          context.fillRect(spec.corner.x, spec.corner.y, spec.size.w, spec.size.h);
+
+          context.strokeStyle = 'rgba(0,0,0,0)';
+          context.strokeRect(spec.corner.x, spec.corner.y, spec.size.w, spec.size.h);
+
+          context.restore();
+      }
+
+      return that;
+  }
+
   return{
     initialize: initialize,
     beginRender: beginRender,
     Background: Background,
     Tile: Tile,
     ParticleSystem: ParticleSystem,
-    Sprite: Sprite
+    Sprite: Sprite,
+    Shader: Shader
   };
 }());

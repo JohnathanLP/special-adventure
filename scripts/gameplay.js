@@ -11,13 +11,19 @@ myGame.screens['game-play'] = (function(game) {
   var girlVel = {x:0,y:0};
   var onGround = true;
   var terrH = 96;
+  var crashFlag = false;
+  var freeze = false;
+  var day = 0;
+  var dayTime = 0;
+  var dayDur = 1000;
+  var darkness = 0;
 
   //Tile and Sprite Creation
   let girl = Graphics.Sprite({
     imageSource: 'images/desert_girl.png',
     position: {x:32, y:96},
     clip: {x:0, y:0, w:32, h:32},
-    hitbox: {x:19, y:2, w:9, h:30}
+    hitbox: {x:19, y:2, w:15, h:30}
   });
   girl.addAnimation({
     name: 'run',
@@ -42,10 +48,24 @@ myGame.screens['game-play'] = (function(game) {
   });
   girl.setAnimation('run');
 
-  let background = Graphics.Background({
-    imageSource: 'images/desert_background.png',
+  let backgroundTop = Graphics.Background({
+    imageSource: 'images/desert_background_top.png',
     position: {x:0, y:0},
     clip: {x:0, y:0, w:512, h:128}
+  });
+  let backgroundBot = Graphics.Background({
+    imageSource: 'images/desert_background_bottom.png',
+    position: {x:0, y:0},
+    clip: {x:0, y:0, w:512, h:128}
+  });
+
+  let nightShader = Graphics.Shader({
+      corner: { x: 0, y: 0 },
+      size: { w: 256, h: 160 },
+      r: 10,
+      g: 0,
+      b: 0,
+      a: 0
   });
 
   let sun = Graphics.Sprite({
@@ -87,7 +107,6 @@ myGame.screens['game-play'] = (function(game) {
         if(tiles[i][j] != null){
           tiles[i][j].setPosition((j*32)-offset, 128-(32*i));
           tiles[i][j].draw();
-        }else{
         }
       }
     }
@@ -97,6 +116,8 @@ myGame.screens['game-play'] = (function(game) {
     //TODO clean up/improve procedural generation
     if(offset > 32){
       distance_run++;
+      console.log(distance_run);
+      speed += .01;
       for(var i=0; i<tiles.length; i++){
         //sand tiles
         if(i == 0){
@@ -140,19 +161,37 @@ myGame.screens['game-play'] = (function(game) {
     }
   }
 
-  //TODO remove if unused
-  function convertToGrid(spec){
-    return{
-      x: Math.floor((spec.x-offset)/32),
-      y: Math.floor(spec.y/32)
+  function testCrash(){
+    let right = Math.floor((girl.getHitboxBounds().r-offset)/32);
+    let safeFlag = true;
+    for(var i=1; i<tiles.length; i++){
+      if(tiles[i][right] != null){
+        let girlHB = girl.getHitboxBounds();
+        girlHB.b -= 5;
+        if(rectangleCollision(girlHB, tiles[i][right].getHitboxBounds()) && !crashFlag){
+          speed -= .5;
+          //console.log(speed);
+          safeFlag = false;
+          crashFlag = true;
+        }
+      }
     }
+    if(safeFlag){
+      crashFlag = false;
+    }
+    //console.log(crashFlag);
   }
 
   function drawBackground(){
-    background.setPosition(-background_offset/2,0);
-    background.draw();
-    background.setPosition((-background_offset+512)/2,0);
-    background.draw();
+    backgroundTop.setPosition(-background_offset/2,0);
+    backgroundTop.draw();
+    backgroundTop.setPosition((-background_offset/2)+512,0);
+    backgroundTop.draw();
+    sun.draw();
+    backgroundBot.setPosition(-background_offset/2,0);
+    backgroundBot.draw();
+    backgroundBot.setPosition((-background_offset/2)+512,0);
+    backgroundBot.draw();
   }
 
   function addSandstormParticles(){
@@ -160,9 +199,9 @@ myGame.screens['game-play'] = (function(game) {
       sandstorm.add({
       position: {x: 256, y: (Math.random()*192)-64},
       direction: {x:-5, y:.5},
-      speed: speed,
+      speed: speed+(Math.random()*10)-5,
       rotation: 0,
-      lifetime: 4,
+      lifetime: 120/speed,
       width: 1,
       height: 1,
       fill: 'rgba(0, 0, 0, 1)',
@@ -259,11 +298,11 @@ myGame.screens['game-play'] = (function(game) {
 
   function update(elapsedTime){
     var time = 0;
-    sun.move(0,.01);
     if(!isNaN(elapsedTime)){
       time = elapsedTime;
     }
     girl.animate(time, speed);
+    testCrash();
 
     let right = Math.floor((girl.getHitboxBounds().r-offset)/32);
     for(var i=1; i<tiles.length; i++){
@@ -285,21 +324,31 @@ myGame.screens['game-play'] = (function(game) {
     terrH = getAltitude();
     offset += speed/time;
     background_offset += speed/time;
-    if(background_offset >= 512){
+    if(background_offset >= 1024){
       background_offset = 0;
     }
 
     pushTiles();
     sandstorm.update(time);
     addSandstormParticles();
+
+    //game over
+    if(speed <= 0){
+      speed = 0;
+      console.log('game over');
+    }
+    dayTime += time/100;
+    sun.move(0,(65/dayDur)*(time/100));
+    darkness += .0001;
+    nightShader.setA(darkness);
   }
 
   function render(){
     drawBackground();
-    sun.draw();
-    girl.draw();
     drawTiles();
+    girl.draw();
     sandstorm.draw();
+    nightShader.draw();
   }
 
   function run(){
