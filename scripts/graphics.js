@@ -179,7 +179,7 @@ let Graphics = (function(){
     that.animate = function(elapsedTime, speed){
       counter += (elapsedTime*speed);
       //console.log(counter);
-      if(counter > (animations[currentAnimation].delay[frame]*20)/speed){
+      if(counter > (animations[currentAnimation].delay[frame]*40)/speed){
         counter = 0;
         frame++;
         if(frame >= animations[currentAnimation].frames){

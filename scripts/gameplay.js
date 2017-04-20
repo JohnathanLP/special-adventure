@@ -1,7 +1,7 @@
 myGame.screens['game-play'] = (function(game) {
   //Primary Variables:
   var lastTimeStamp;
-  var speed = 20;
+  var speed = 30;
   var offset = 0;
   var background_offset = 0;
   var sandstorm_intensity = 1;
@@ -38,7 +38,7 @@ myGame.screens['game-play'] = (function(game) {
     frames: 9,
     frameX: [0,1,2, 0,1,2, 0,1,0],
     frameY: [2,2,2, 3,3,3, 4,4,2],
-    delay: [2000,1800,1600, 700,700,700, 1000,3000,3000]
+    delay: [2400,2200,2000, 900,900,900, 1700,3400,3400]
   });
   girl.setAnimation('run');
 
@@ -46,6 +46,13 @@ myGame.screens['game-play'] = (function(game) {
     imageSource: 'images/desert_background.png',
     position: {x:0, y:0},
     clip: {x:0, y:0, w:512, h:128}
+  });
+
+  let sun = Graphics.Sprite({
+    imageSource: 'images/sun.png',
+    position: {x:32, y:32},
+    clip: {x:0, y:0, w:20, h:20},
+    hitbox: {x:0, y:0, w:20, h:20}
   });
 
   //tiles array, holds sand and tiles[1]
@@ -175,6 +182,7 @@ myGame.screens['game-play'] = (function(game) {
       let left = Math.floor((girl.getHitboxBounds().l-offset)/32);
       let right = Math.floor((girl.getHitboxBounds().r-offset)/32);
       let bottom = 4-Math.floor(girl.getHitboxBounds().b/32);
+      let flag = false;
       if(bottom>=0 && bottom < tiles.length){
         for(var i=left; i<=right+1; i++){
           if(tiles[bottom][i] != null){
@@ -182,10 +190,14 @@ myGame.screens['game-play'] = (function(game) {
               girl.setPosition(girlPosX,tiles[bottom][i].getHitboxBounds().t-32);
               girl.setAnimation('run');
               onGround = true;
+              flag = true;
               girlVel.y = 0;
             }
           }
         }
+      }
+      if(!flag){
+        onGround = false;
       }
     }
     if(girlVel.y < 0){
@@ -247,6 +259,7 @@ myGame.screens['game-play'] = (function(game) {
 
   function update(elapsedTime){
     var time = 0;
+    sun.move(0,.01);
     if(!isNaN(elapsedTime)){
       time = elapsedTime;
     }
@@ -283,6 +296,7 @@ myGame.screens['game-play'] = (function(game) {
 
   function render(){
     drawBackground();
+    sun.draw();
     girl.draw();
     drawTiles();
     sandstorm.draw();
