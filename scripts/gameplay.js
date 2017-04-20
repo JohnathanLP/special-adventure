@@ -8,7 +8,7 @@ myGame.screens['game-play'] = (function(game) {
   var girlPosX = 32;
   var distance_run = 0;
   var cancelNextRequest = false;
-  var girlVelY = 0;
+  var girlVel = {x:0,y:0};
   var onGround = true;
   var terrH = 96;
 
@@ -17,7 +17,7 @@ myGame.screens['game-play'] = (function(game) {
     imageSource: 'images/desert_girl.png',
     position: {x:32, y:96},
     clip: {x:0, y:0, w:32, h:32},
-    hitbox: {x:2, y:2, w:27, h:32}
+    hitbox: {x:2, y:2, w:27, h:30}
   });
   girl.addAnimation({
     name: 'run',
@@ -57,7 +57,7 @@ myGame.screens['game-play'] = (function(game) {
     if(sel >= 4){
       sel = 0;
     }
-    let sandTile = Graphics.Sprite({
+    let sandTile = Graphics.Tile({
       imageSource: 'images/sand_tiles.png',
       position: {x:32, y:97},
       clip: {x:32*sel, y:0, w:32, h:32}
@@ -96,7 +96,7 @@ myGame.screens['game-play'] = (function(game) {
           if(sel >= 4){
             sel = 0;
           }
-          let tile = Graphics.Sprite({
+          let tile = Graphics.Tile({
             imageSource: 'images/sand_tiles.png',
             position: {x:32, y:97},
             clip: {x:32*sel, y:0, w:32, h:32}
@@ -107,7 +107,7 @@ myGame.screens['game-play'] = (function(game) {
         else{
           let sel = Math.floor(Math.random()*5);
           if(sel == 1){
-            let tile = Graphics.Sprite({
+            let tile = Graphics.Tile({
               imageSource: 'images/obstacles.png',
               position: {x:32, y:64},
               clip: {x:0, y:0, w:32, h:32}
@@ -123,31 +123,80 @@ myGame.screens['game-play'] = (function(game) {
     }
   }
 
-  function testCollision(spec){
-    //spec includes a hitbox, a distance and a direction. Tests the grid in
-    //direction for distance to see if the hitbox will collide with anything.
-    //Returns the minimum of the distance given and the distance to the closest
-    //obstacle.
-    if(spec.direction == 'down'){
-      var l = convertToGrid({x:spec.hitbox.l, y:spec.hitbox.b});
-      var r = convertToGrid({x:spec.hitbox.r, y:spec.hitbox.b});
-      //console.log(r);
-      var distOut = spec.distance;
-      for(var i=l.x; i<=r.x; i++){
-        console.log(Math.floor(spec.distance/32));
-        for(var j=0; j<=Math.floor(spec.distance/32); j++){
-          if(tiles[i][4-l.y+j] != null){
-            if(tiles[i][4-l.y+j].getHitboxBounds().t < spec.hitbox.b+distOut){
-              distOut = tiles[i][4-l.y+j].getHitboxBounds().t;
-              console.log('object is closer!');
+  function testCollision(hitboxIn, motion){
+    //takes in a hitbox and a motion vector. Tests first the x, then the y,
+    //returns the minimum of the original vector and the distance to the
+    //next obstacle in tiles array
+    let output = motion;
+    output.collision = {t:false,b:false,r:false,l:false};
+
+    // let y = 4-Math.floor(hitboxIn.b/32);
+    // let x = Math.floor((hitboxIn.r-offset)/32);
+    //
+    // console.log('y:', y);
+    // console.log('x:', x);
+    // console.log('tiles.length: ', tiles.length);
+    // //limit y coordinate to the size of tiles
+    // if(y >= 0 && y < tiles.length){
+    //   console.log('within bounds' , tiles[y][x]);
+    // }
+    // else{
+    //   console.log('out of bounds');
+    // }
+
+    //limits of the hitbox, in terms of scrolling grid
+    let r = Math.floor((hitboxIn.r-offset)/32);
+    let l = Math.floor((hitboxIn.l-offset)/32);
+    let b = 4-Math.floor(hitboxIn.b/32);
+    let t = 4-Math.floor(hitboxIn.t/32);
+
+    //console.log('r: ', r, ' l: ', l, ' b: ', b, ' t: ', t);
+
+    //tests motion to the right
+    if(motion.x > 0){
+
+    }
+    //tests motion to the left
+    if(motion.x < 0){
+
+    }
+    //tests motion up
+    if(motion.y < 0){
+
+    }
+    //tests motion down
+    if(motion.y > 0){
+      //iterates away from the bottom of the hitbox
+      for(var i=-1; i<motion.y/32; i++){
+        //iterates across the bottom of the hitbox, left to right
+        for(var j=l; j<=r; j++){
+          if(b+i>=0 && b+i<tiles.length){
+            //console.log(tiles[b+i][j]);
+            if(tiles[b+i][j] != null){
+              //console.log('collision');
+              console.log(hitboxIn.b, ', ', tiles[b+i][j].getHitboxBounds().t);
+              console.log(tiles[b+i][j].getHitboxBounds().t - hitboxIn.b, ', ', output.y);
+              if(tiles[b+i][j].getHitboxBounds().t - hitboxIn.b < output.y){
+                output.y = tiles[b+i][j].getHitboxBounds().t - hitboxIn.b;
+              }
+              if(tiles[b+i][j].getHitboxBounds().t - hitboxIn.b == output.y){
+                console.log('landed');
+                output.collision.b = true;
+              }
+              if(output.y < 0){
+                output.y = 0;
+              }
             }
           }
         }
       }
-      return distOut;
     }
+
+    //console.log(output);
+    return output;
   }
 
+  //TODO remove if unused
   function convertToGrid(spec){
     return{
       x: Math.floor((spec.x-offset)/32),
@@ -183,25 +232,21 @@ myGame.screens['game-play'] = (function(game) {
 	}
 
   function handleGravity(){
-    girlVelY += .1;
-    if(girlVelY > 0){
-      girlVelY = testCollision({hitbox: girl.getHitboxBounds(), distance: girlVelY, direction: 'down'});
+    girlVel.y += .1;
+    girlVel = testCollision(girl.getHitboxBounds(), girlVel);
+    if(girlVel.collision.b == true){
+      onGround = true;
+      girl.setAnimation('run');
     }
-    //console.log(girlVelY);
-    girl.move(0,girlVelY)
-    // if(girl.getHitboxBounds().b >= terrH){
-    //   girlVelY = 0;
-    //   girl.setPosition(girlPosX, terrH);
-    //   onGround = true;
-    //   girl.setAnimation('run');
-    // }
+    //console.log(girlVel);
+    girl.move(girlVel.x,girlVel.y)
   }
 
   function jump(){
     if(onGround){
       girl.setAnimation('jump');
       onGround = false;
-      girlVelY = -3;
+      girlVel.y = -3;
     }
   }
 
@@ -262,6 +307,7 @@ myGame.screens['game-play'] = (function(game) {
     if(!onGround){
       handleGravity();
     }
+    testCollision(girl.getHitboxBounds(), {x:0, y:girlVel.y});
 
     terrH = getAltitude();
     offset += speed/time;
