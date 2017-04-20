@@ -17,7 +17,7 @@ myGame.screens['game-play'] = (function(game) {
     imageSource: 'images/desert_girl.png',
     position: {x:32, y:96},
     clip: {x:0, y:0, w:32, h:32},
-    hitbox: {x:2, y:2, w:27, h:30}
+    hitbox: {x:19, y:2, w:9, h:30}
   });
   girl.addAnimation({
     name: 'run',
@@ -87,6 +87,7 @@ myGame.screens['game-play'] = (function(game) {
   }
 
   function pushTiles(){
+    //TODO clean up/improve procedural generation
     if(offset > 32){
       distance_run++;
       for(var i=0; i<tiles.length; i++){
@@ -123,77 +124,13 @@ myGame.screens['game-play'] = (function(game) {
     }
   }
 
-  function testCollision(hitboxIn, motion){
-    //takes in a hitbox and a motion vector. Tests first the x, then the y,
-    //returns the minimum of the original vector and the distance to the
-    //next obstacle in tiles array
-    let output = motion;
-    output.collision = {t:false,b:false,r:false,l:false};
-
-    // let y = 4-Math.floor(hitboxIn.b/32);
-    // let x = Math.floor((hitboxIn.r-offset)/32);
-    //
-    // console.log('y:', y);
-    // console.log('x:', x);
-    // console.log('tiles.length: ', tiles.length);
-    // //limit y coordinate to the size of tiles
-    // if(y >= 0 && y < tiles.length){
-    //   console.log('within bounds' , tiles[y][x]);
-    // }
-    // else{
-    //   console.log('out of bounds');
-    // }
-
-    //limits of the hitbox, in terms of scrolling grid
-    let r = Math.floor((hitboxIn.r-offset)/32);
-    let l = Math.floor((hitboxIn.l-offset)/32);
-    let b = 4-Math.floor(hitboxIn.b/32);
-    let t = 4-Math.floor(hitboxIn.t/32);
-
-    //console.log('r: ', r, ' l: ', l, ' b: ', b, ' t: ', t);
-
-    //tests motion to the right
-    if(motion.x > 0){
-
+  function rectangleCollision(a,b){
+    if(a.l<b.r && a.r>b.l && a.t<b.b && a.b>b.t && a.t<b.b){
+      return true;
     }
-    //tests motion to the left
-    if(motion.x < 0){
-
+    else{
+      return false;
     }
-    //tests motion up
-    if(motion.y < 0){
-
-    }
-    //tests motion down
-    if(motion.y > 0){
-      //iterates away from the bottom of the hitbox
-      for(var i=-1; i<motion.y/32; i++){
-        //iterates across the bottom of the hitbox, left to right
-        for(var j=l; j<=r; j++){
-          if(b+i>=0 && b+i<tiles.length){
-            //console.log(tiles[b+i][j]);
-            if(tiles[b+i][j] != null){
-              //console.log('collision');
-              console.log(hitboxIn.b, ', ', tiles[b+i][j].getHitboxBounds().t);
-              console.log(tiles[b+i][j].getHitboxBounds().t - hitboxIn.b, ', ', output.y);
-              if(tiles[b+i][j].getHitboxBounds().t - hitboxIn.b < output.y){
-                output.y = tiles[b+i][j].getHitboxBounds().t - hitboxIn.b;
-              }
-              if(tiles[b+i][j].getHitboxBounds().t - hitboxIn.b == output.y){
-                console.log('landed');
-                output.collision.b = true;
-              }
-              if(output.y < 0){
-                output.y = 0;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    //console.log(output);
-    return output;
   }
 
   //TODO remove if unused
@@ -233,12 +170,27 @@ myGame.screens['game-play'] = (function(game) {
 
   function handleGravity(){
     girlVel.y += .1;
-    girlVel = testCollision(girl.getHitboxBounds(), girlVel);
-    if(girlVel.collision.b == true){
-      onGround = true;
-      girl.setAnimation('run');
+    if(girlVel.y > 0){
+      //iterate left to right all cells that intersect the bottom edge of the hitbox
+      let left = Math.floor((girl.getHitboxBounds().l-offset)/32);
+      let right = Math.floor((girl.getHitboxBounds().r-offset)/32);
+      let bottom = 4-Math.floor(girl.getHitboxBounds().b/32);
+      if(bottom>=0 && bottom < tiles.length){
+        for(var i=left; i<=right+1; i++){
+          if(tiles[bottom][i] != null){
+            if(rectangleCollision(girl.getHitboxBounds(),tiles[bottom][i].getHitboxBounds())){
+              girl.setPosition(girlPosX,tiles[bottom][i].getHitboxBounds().t-32);
+              girl.setAnimation('run');
+              onGround = true;
+              girlVel.y = 0;
+            }
+          }
+        }
+      }
     }
-    //console.log(girlVel);
+    if(girlVel.y < 0){
+      //TODO collide with tiles above
+    }
     girl.move(girlVel.x,girlVel.y)
   }
 
@@ -246,7 +198,7 @@ myGame.screens['game-play'] = (function(game) {
     if(onGround){
       girl.setAnimation('jump');
       onGround = false;
-      girlVel.y = -3;
+      girlVel.y = -3.5;
     }
   }
 
@@ -269,7 +221,6 @@ myGame.screens['game-play'] = (function(game) {
 
   //Primary Functions:
   function initialize(){
-
     document.getElementById('id-game-play-back').addEventListener(
 		'click',
 		function() {
@@ -301,13 +252,22 @@ myGame.screens['game-play'] = (function(game) {
     }
     girl.animate(time, speed);
 
+    let right = Math.floor((girl.getHitboxBounds().r-offset)/32);
+    for(var i=1; i<tiles.length; i++){
+      if(tiles[i][right] != null){
+        if(girl.getHitboxBounds().r > tiles[i][right].getHitboxBounds().l && girl.getHitboxBounds().b > tiles[i][right].getHitboxBounds().t){
+          //TODO clean up collision detection and decriment speed
+          //console.log('crash');
+        }
+      }
+    }
+
     if(girl.getY() < terrH){
       onGround = false;
     }
     if(!onGround){
       handleGravity();
     }
-    testCollision(girl.getHitboxBounds(), {x:0, y:girlVel.y});
 
     terrH = getAltitude();
     offset += speed/time;
