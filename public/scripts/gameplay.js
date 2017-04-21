@@ -152,7 +152,10 @@ myGame.screens['game-play'] = (function(game) {
     if(offset > 32){
       distance_run++;
       //console.log(distance_run);
-      speed += .01;
+      speed += .1;
+      if(speed > 30){
+        speed = 30;
+      }
       for(var i=0; i<tiles.length; i++){
         //sand tiles
         if(i == 0){
@@ -204,7 +207,7 @@ myGame.screens['game-play'] = (function(game) {
         let girlHB = girl.getHitboxBounds();
         girlHB.b -= 5;
         if(rectangleCollision(girlHB, tiles[i][right].getHitboxBounds()) && !crashFlag){
-          speed -= .5;
+          speed -= .8;
           //console.log(speed);
           safeFlag = false;
           crashFlag = true;
@@ -411,6 +414,8 @@ myGame.screens['game-play'] = (function(game) {
   }
 
   function run(){
+    console.log('starting over?')
+    Graphics.clearBackground();
     //cancelNextRequest = false;
     //distance_run = 0;
     //gameOver = false;
@@ -447,9 +452,7 @@ myGame.screens['game-play'] = (function(game) {
       Persistence.add(74);
       myKeyboard.registerCommand(74, jump);
       var keyBoardControls = Persistence.getControls();
-      //console.log(keyBoardControls);
     }else{
-      //console.log("we have something");
       var jumpKey = keyBoardControls.jump;
       myKeyboard.registerCommand(jumpKey, jump);
     }

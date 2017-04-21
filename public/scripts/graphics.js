@@ -1,12 +1,14 @@
 let Graphics = (function(){
 
-  let canvas = document.getElementById('id-maincanvas');
-  context = canvas.getContext('2d');
+  // let canvas = document.getElementById('id-maincanvas');
+  // context = canvas.getContext('2d');
 
-  //let context = null;
+  let context = null;
   function initialize(){
-    //let canvas = document.getElementById('id-maincanvas');
-    //context = canvas.getContext('2d');
+    let canvas = document.getElementById('id-maincanvas');
+    context = canvas.getContext('2d');
+
+
 
     CanvasRenderingContext2D.prototype.clear = function() {
         this.save();
@@ -14,6 +16,13 @@ let Graphics = (function(){
         this.clearRect(0, 0, canvas.width, canvas.height);
         this.restore();
     };
+  }
+
+  function clearBackground(){
+    console.log('this gets called');
+    let canvas = document.getElementById('id-maincanvas');
+    context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
   }
 
   function beginRender(){
@@ -420,6 +429,7 @@ let Graphics = (function(){
 
   return{
     initialize: initialize,
+    clearBackground: clearBackground,
     beginRender: beginRender,
     Background: Background,
     Tile: Tile,
