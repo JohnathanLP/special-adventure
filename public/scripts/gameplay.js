@@ -106,6 +106,8 @@ myGame.screens['game-play'] = (function(game) {
   let tiles = [];
   //add sand row
   tiles.push([]);
+  tiles.push([]);
+  tiles.push([]);
   for(var i=0; i<9; i++){
     let sel = Math.floor(Math.random()*15);
     if(sel >= 4){
@@ -122,6 +124,8 @@ myGame.screens['game-play'] = (function(game) {
   tiles.push([]);
   for(var i=0; i<9; i++){
     tiles[1].push(null);
+    tiles[2].push(null);
+    tiles[3].push(null);
   }
 
   let sandstorm = Graphics.ParticleSystem();
@@ -166,8 +170,8 @@ myGame.screens['game-play'] = (function(game) {
           tiles[i].push(tile);
         }
         //obstacle tiles
-        else{
-          let sel = Math.floor(Math.random()*5);
+        else if(i == 1){
+          let sel = Math.floor(Math.random()*3);
           if(sel == 1){
             let tile = Graphics.Tile({
               imageSource: 'images/obstacles.png',
@@ -175,6 +179,40 @@ myGame.screens['game-play'] = (function(game) {
               clip: {x:0, y:0, w:32, h:32}
             });
             tiles[i].push(tile);
+          }else{
+            tiles[i].push(null);
+          }
+        }else if(i == 2){
+          let sel = Math.floor(Math.random()*5);
+          if(sel == 1){
+            if(tiles[1][tiles[2].length-2] == null && tiles[1][tiles[2].length-3] == null &&  tiles[2][tiles[2].length-2] == null){
+              console.log('bad tile');
+              tiles[i].push(null);
+            }else{
+              let tile = Graphics.Tile({
+                imageSource: 'images/obstacles.png',
+                position: {x:32, y:64},
+                clip: {x:0, y:0, w:32, h:32}
+              });
+              tiles[i].push(tile);
+            }
+          }else{
+            tiles[i].push(null);
+          }
+        }else if(i == 3){
+          let sel = Math.floor(Math.random()*5);
+          if(sel == 1){
+            if(tiles[2][tiles[2].length-2] == null && tiles[2][tiles[2].length-3] == null &&  tiles[3][tiles[2].length-2] == null){
+              console.log('bad tile');
+              tiles[i].push(null);
+            }else{
+              let tile = Graphics.Tile({
+                imageSource: 'images/obstacles.png',
+                position: {x:32, y:64},
+                clip: {x:0, y:0, w:32, h:32}
+              });
+              tiles[i].push(tile);
+            }
           }else{
             tiles[i].push(null);
           }
@@ -214,9 +252,9 @@ myGame.screens['game-play'] = (function(game) {
     if(crashFlag){
       //if girl has not previously crashed
       if(safeFlag){
-        console.log('crash');
         safeFlag = false;
         girl.setAnimation('flash');
+        //TODO uncomment crashes
         speed -= 3;
         safeCount = 0;
       }
