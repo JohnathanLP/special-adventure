@@ -18,13 +18,6 @@ let Graphics = (function(){
     };
   }
 
-  function clearBackground(){
-    console.log('this gets called');
-    let canvas = document.getElementById('id-maincanvas');
-    context = canvas.getContext('2d');
-    context.clearRect(0, 0, canvas.width, canvas.height);
-  }
-
   function beginRender(){
     context.clear();
   }
@@ -243,6 +236,10 @@ let Graphics = (function(){
     var that = {};
     var particles = [];
 
+    that.clearAll = function(){
+      particles = [];
+    }
+
     that.add = function(spec){
       var p = Particle(spec);
       particles.push(p);
@@ -429,7 +426,6 @@ let Graphics = (function(){
 
   return{
     initialize: initialize,
-    clearBackground: clearBackground,
     beginRender: beginRender,
     Background: Background,
     Tile: Tile,

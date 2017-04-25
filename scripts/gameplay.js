@@ -12,14 +12,11 @@ myGame.screens['game-play'] = (function(game) {
   var onGround = true;
   var terrH = 96;
   var crashFlag = false;
-  var safeFlag = true;
-  var safeCount = 0;
   var freeze = false;
   var day = 0;
   var dayTime = 0;
   var dayDur = 1000;
   var darkness = 0;
-  var gameOver = false;
 
   //Tile and Sprite Creation
   let girl = Graphics.Sprite({
@@ -49,13 +46,6 @@ myGame.screens['game-play'] = (function(game) {
     frameY: [2,2,2, 3,3,3, 4,4,2],
     delay: [2400,2200,2000, 900,900,900, 1700,3400,3400]
   });
-  girl.addAnimation({
-    name: 'flash',
-    frames: 3,
-    frameX: [0,3,1,3,2,3],
-    frameY: [1,1,1,1,1,1],
-    delay: [1700,1700,1700,1700,1700,1700]
-  })
   girl.setAnimation('run');
 
   let backgroundTop = Graphics.Background({
@@ -76,23 +66,6 @@ myGame.screens['game-play'] = (function(game) {
       g: 0,
       b: 0,
       a: 0
-  });
-
-  //This stuff is still blurry, but not as bad
-  let gameOverText = Graphics.Text({
-    text : 'Game Over!',
-    font : '16px Anton, Helvetica, sans-serif',
-    fill : 'rgb(0, 0, 0)',
-    stroke : 'rgb(0, 0, 0)',
-    pos : {x : 80, y : 50}
-  });
-
-  let dayCompleteText = Graphics.Text({
-    text : 'Day Complete',
-    font : '16px Anton, Helvetica, sans-serif',
-    fill : 'rgb(0, 0, 0)',
-    stroke : 'rgb(0, 0, 0)',
-    pos : {x : 80, y : 50}
   });
 
   let sun = Graphics.Sprite({
@@ -118,6 +91,7 @@ myGame.screens['game-play'] = (function(game) {
     });
     tiles[0].push(sandTile);
   }
+  console.log(tiles);
   //add first obstacle row
   tiles.push([]);
   for(var i=0; i<9; i++){
@@ -142,15 +116,8 @@ myGame.screens['game-play'] = (function(game) {
     //TODO clean up/improve procedural generation
     if(offset > 32){
       distance_run++;
-      //console.log(distance_run);
-      if(speed >= 10){
-        speed += .1;
-      }else{
-        speed -= 4;
-      }
-      if(speed > 30){
-        speed = 30;
-      }
+      console.log(distance_run);
+      speed += .01;
       for(var i=0; i<tiles.length; i++){
         //sand tiles
         if(i == 0){
@@ -196,44 +163,23 @@ myGame.screens['game-play'] = (function(game) {
 
   function testCrash(){
     let right = Math.floor((girl.getHitboxBounds().r-offset)/32);
-    crashFlag = false;
-    //iterates through rows
+    let safeFlag = true;
     for(var i=1; i<tiles.length; i++){
-      //tests if there is a tile to the right of the girl
-      if(tiles[i][right] != null && tiles[i][right-1] == null){
-        //clip girl's hitbox to allow for some generosity on the ground
+      if(tiles[i][right] != null){
         let girlHB = girl.getHitboxBounds();
         girlHB.b -= 5;
-        //if girl's hitbox collides with tile's hitbox
-        if(rectangleCollision(girlHB, tiles[i][right].getHitboxBounds())){
+        if(rectangleCollision(girlHB, tiles[i][right].getHitboxBounds()) && !crashFlag){
+          speed -= .5;
+          //console.log(speed);
+          safeFlag = false;
           crashFlag = true;
         }
       }
     }
-    //if girl crashed on this call
-    if(crashFlag){
-      //if girl has not previously crashed
-      if(safeFlag){
-        console.log('crash');
-        safeFlag = false;
-        girl.setAnimation('flash');
-        speed -= 3;
-        safeCount = 0;
-      }
+    if(safeFlag){
+      crashFlag = false;
     }
-    //if girl did not crash on this call
-    else{
-      if(!safeFlag){
-        //girl.setAnimation('run');
-      }
-      safeFlag = true;
-      if(safeCount < 20){
-        safeCount++;
-      }
-      if(safeCount == 19){
-        girl.setAnimation('run');
-      }
-    }
+    //console.log(crashFlag);
   }
 
   function drawBackground(){
@@ -356,16 +302,17 @@ myGame.screens['game-play'] = (function(game) {
       time = elapsedTime;
     }
     girl.animate(time, speed);
-
-    var scoreField = document.getElementById('scoreSpan').innerHTML;
-  	scoreField = "Distance: " + distance_run;
-  	document.getElementById('scoreSpan').innerHTML = scoreField;
-
-    var speedField = document.getElementById('speedSpan').innerHTML;
-  	text = "Speed: " + Number(speed).toFixed(2);
-  	document.getElementById('speedSpan').innerHTML = text;
-
     testCrash();
+
+    let right = Math.floor((girl.getHitboxBounds().r-offset)/32);
+    for(var i=1; i<tiles.length; i++){
+      if(tiles[i][right] != null){
+        if(girl.getHitboxBounds().r > tiles[i][right].getHitboxBounds().l && girl.getHitboxBounds().b > tiles[i][right].getHitboxBounds().t){
+          //TODO clean up collision detection and decriment speed
+          //console.log('crash');
+        }
+      }
+    }
 
     if(girl.getY() < terrH){
       onGround = false;
@@ -386,14 +333,10 @@ myGame.screens['game-play'] = (function(game) {
     addSandstormParticles();
 
     //game over
-    if(speed <= 5){
+    if(speed <= 0){
       speed = 0;
-      gameOver = true;
-      var speedField = document.getElementById('speedSpan').innerHTML;
-    	text = "Speed: " + Number(speed).toFixed(2);
-    	document.getElementById('speedSpan').innerHTML = text;
+      console.log('game over');
     }
-
     dayTime += time/100;
     sun.move(0,(65/dayDur)*(time/100));
     darkness += .0001;
@@ -406,59 +349,25 @@ myGame.screens['game-play'] = (function(game) {
     girl.draw();
     sandstorm.draw();
     nightShader.draw();
-    //Text Rendering
-    //scoreText.draw();
-    //speedText.draw();
-
-    //This is rather hackery
-    if(gameOver){
-      gameOverText.draw();
-      addScore(distance_run);
-      cancelNextRequest = true;
-    }
   }
 
   function run(){
-    console.log('starting over?')
-    //cancelNextRequest = false;
-    //distance_run = 0;
-    //gameOver = false;
-     speed = 30;
-     offset = 0;
-     background_offset = 0;
-     sandstorm_intensity = 1;
-     girlPosX = 32;
-     distance_run = 0;
-     cancelNextRequest = false;
-     girlVel = {x:0,y:0};
-     onGround = true;
-     terrH = 96;
-     crashFlag = false;
-     safeFlag = true;
-     freeze = false;
-     day = 0;
-     dayTime = 0;
-     dayDur = 1000;
-     darkness = 0;
-     gameOver = false;
-     sandstorm.clearAll();
+    cancelNextRequest = false;
+    distance_run = 0;
     //TODO Comment this back in. I just got tired of it playing.
     //AudioPlayer.playSound('audio/desert');
 
     myKeyboard = Input.Keyboard();
     var keyBoardControls = Persistence.getControls();
-    //console.log(keyBoardControls);
-
-    //TODO: Sun needs to reset
-    //This isn't doing the trick
-    sun.position = {x: 32, y: 32};
-    //console.log(sun.position);
+    console.log(keyBoardControls);
 
     if(isEmpty(keyBoardControls)){
       Persistence.add(74);
       myKeyboard.registerCommand(74, jump);
       var keyBoardControls = Persistence.getControls();
+      console.log(keyBoardControls);
     }else{
+      console.log("we have something");
       var jumpKey = keyBoardControls.jump;
       myKeyboard.registerCommand(jumpKey, jump);
     }
