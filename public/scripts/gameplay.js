@@ -6,7 +6,7 @@ myGame.screens['game-play'] = (function(game) {
   var background_offset = 0;
   var sandstorm_intensity = 1;
   var girlPosX = 32;
-  var distance_run = 0;
+  var distanceRun = 0;
   var cancelNextRequest = false;
   var girlVel = {x:0,y:0};
   var onGround = true;
@@ -18,8 +18,11 @@ myGame.screens['game-play'] = (function(game) {
   var day = 0;
   var dayTime = 0;
   var dayDur = 1000;
+  var targetDist = 100;
   var darkness = 0;
   var gameOver = false;
+  var newDay = false;
+  var newDayCount = 0;
 
   //Tile and Sprite Creation
   let girl = Graphics.Sprite({
@@ -82,16 +85,16 @@ myGame.screens['game-play'] = (function(game) {
   let gameOverText = Graphics.Text({
     text : 'Game Over!',
     font : '16px Anton, Helvetica, sans-serif',
-    fill : 'rgb(0, 0, 0)',
-    stroke : 'rgb(0, 0, 0)',
+    fill : 'rgb(255, 255, 255)',
+    stroke : 'rgb(255, 255, 255)',
     pos : {x : 80, y : 50}
   });
 
   let dayCompleteText = Graphics.Text({
     text : 'Day Complete',
     font : '16px Anton, Helvetica, sans-serif',
-    fill : 'rgb(0, 0, 0)',
-    stroke : 'rgb(0, 0, 0)',
+    fill : 'rgb(256, 256, 256)',
+    stroke : 'rgb(256, 256, 256)',
     pos : {x : 80, y : 50}
   });
 
@@ -145,12 +148,10 @@ myGame.screens['game-play'] = (function(game) {
   function pushTiles(){
     //TODO clean up/improve procedural generation
     if(offset > 32){
-      distance_run++;
-      //console.log(distance_run);
+      distanceRun++;
+      //console.log(distanceRun);
       if(speed >= 10){
         speed += .1;
-      }else{
-        speed -= 4;
       }
       if(speed > 30){
         speed = 30;
@@ -362,6 +363,28 @@ myGame.screens['game-play'] = (function(game) {
     return true;
   }
 
+  function startNewDay(){
+    console.log('new day');
+    speed = 0;
+    newDay = true;
+    newDayCount++;
+    if(newDayCount >= 100){
+      newDayCount = 0;
+      newDay = false;
+      speed = 30;
+      darkness = 0;
+      targetDist += 50;
+      sun.setPosition(32,32);
+      for(var i=0; i<tiles[0].length; i++){
+        tiles[1][i] = null;
+        tiles[2][i] = null;
+        tiles[3][i] = null;
+      }
+      girl.setPosition(girlPosX, 96);
+      girl.setAnimation('run');
+    }
+  }
+
   //Primary Functions:
   function initialize(){
     document.getElementById('id-game-play-back').addEventListener(
@@ -393,18 +416,50 @@ myGame.screens['game-play'] = (function(game) {
     if(!isNaN(elapsedTime)){
       time = elapsedTime;
     }
-    girl.animate(time, speed);
+    if(!newDay){
+      girl.animate(time, speed);
+      testCrash();
+      offset += speed/time;
+      background_offset += speed/time;
+      if(background_offset >= 1024){
+        background_offset = 0;
+      }
+
+      pushTiles();
+      sandstorm.update(time);
+      addSandstormParticles();
+
+      //game over
+      if(speed < 10){
+        speed -= .1;
+      }
+      if(speed <= 5){
+        speed = 0;
+        gameOver = true;
+        var speedField = document.getElementById('speedSpan').innerHTML;
+        text = "Speed: " + Number(speed).toFixed(2);
+        document.getElementById('speedSpan').innerHTML = text;
+      }
+      dayTime += time/100;
+      sun.move(0,(65/dayDur)*(time/100));
+      darkness += .0002;
+    }
+    else{
+      darkness += .05;
+    }
 
     var scoreField = document.getElementById('scoreSpan').innerHTML;
-  	scoreField = "Distance: " + distance_run;
+  	scoreField = "Distance: " + distanceRun;
   	document.getElementById('scoreSpan').innerHTML = scoreField;
 
     var speedField = document.getElementById('speedSpan').innerHTML;
   	text = "Speed: " + Number(speed).toFixed(2);
   	document.getElementById('speedSpan').innerHTML = text;
 
-    testCrash();
-
+    terrH = getAltitude();
+    if(distanceRun > targetDist){
+      startNewDay();
+    }
     if(girl.getY() < terrH){
       onGround = false;
     }
@@ -412,29 +467,6 @@ myGame.screens['game-play'] = (function(game) {
       handleGravity();
     }
 
-    terrH = getAltitude();
-    offset += speed/time;
-    background_offset += speed/time;
-    if(background_offset >= 1024){
-      background_offset = 0;
-    }
-
-    pushTiles();
-    sandstorm.update(time);
-    addSandstormParticles();
-
-    //game over
-    if(speed <= 5){
-      speed = 0;
-      gameOver = true;
-      var speedField = document.getElementById('speedSpan').innerHTML;
-    	text = "Speed: " + Number(speed).toFixed(2);
-    	document.getElementById('speedSpan').innerHTML = text;
-    }
-
-    dayTime += time/100;
-    sun.move(0,(65/dayDur)*(time/100));
-    darkness += .0001;
     nightShader.setA(darkness);
   }
 
@@ -451,22 +483,25 @@ myGame.screens['game-play'] = (function(game) {
     //This is rather hackery
     if(gameOver){
       gameOverText.draw();
-      addScore(distance_run);
+      addScore(distanceRun);
       cancelNextRequest = true;
+    }
+    if(newDay){
+      dayCompleteText.draw();
     }
   }
 
   function run(){
     console.log('starting over?')
     //cancelNextRequest = false;
-    //distance_run = 0;
+    //distanceRun = 0;
     //gameOver = false;
      speed = 30;
      offset = 0;
      background_offset = 0;
      sandstorm_intensity = 1;
      girlPosX = 32;
-     distance_run = 0;
+     distanceRun = 0;
      cancelNextRequest = false;
      girlVel = {x:0,y:0};
      onGround = true;
@@ -480,6 +515,13 @@ myGame.screens['game-play'] = (function(game) {
      darkness = 0;
      gameOver = false;
      sandstorm.clearAll();
+     for(var i=0; i<tiles[0].length; i++){
+       tiles[1][i] = null;
+       tiles[2][i] = null;
+       tiles[3][i] = null;
+     }
+     girl.setPosition(girlPosX, 96);
+     girl.setAnimation('run');
     //TODO Comment this back in. I just got tired of it playing.
     //AudioPlayer.playSound('audio/desert');
 
@@ -489,7 +531,7 @@ myGame.screens['game-play'] = (function(game) {
 
     //TODO: Sun needs to reset
     //This isn't doing the trick
-    sun.position = {x: 32, y: 32};
+    sun.setPosition(32, 32);
     //console.log(sun.position);
 
     if(isEmpty(keyBoardControls)){
