@@ -146,7 +146,6 @@ myGame.screens['game-play'] = (function(game) {
   }
 
   function pushTiles(){
-    //TODO clean up/improve procedural generation
     if(offset > 32){
       distanceRun++;
       //console.log(distanceRun);
@@ -255,7 +254,6 @@ myGame.screens['game-play'] = (function(game) {
       if(safeFlag){
         safeFlag = false;
         girl.setAnimation('flash');
-        //TODO uncomment crashes
         speed -= 3;
         safeCount = 0;
       }
@@ -524,8 +522,7 @@ myGame.screens['game-play'] = (function(game) {
      }
      girl.setPosition(girlPosX, 96);
      girl.setAnimation('run');
-    //TODO Comment this back in. I just got tired of it playing.
-    //AudioPlayer.playSound('audio/desert');
+    AudioPlayer.playSound('audio/desert');
 
     myKeyboard = Input.Keyboard();
     var keyBoardControls = Persistence.getControls();
