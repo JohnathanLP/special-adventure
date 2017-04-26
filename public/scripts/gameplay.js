@@ -15,7 +15,7 @@ myGame.screens['game-play'] = (function(game) {
   var safeFlag = true;
   var safeCount = 0;
   var freeze = false;
-  var day = 0;
+  var day = 1;
   var dayTime = 0;
   var dayDur = 1000;
   var targetDist = 100;
@@ -47,10 +47,10 @@ myGame.screens['game-play'] = (function(game) {
   });
   girl.addAnimation({
     name: 'jump',
-    frames: 9,
-    frameX: [0,1,2, 0,1,2, 0,1,0],
-    frameY: [2,2,2, 3,3,3, 4,4,2],
-    delay: [2400,2200,2000, 900,900,900, 1700,3400,3400]
+    frames: 19,
+    frameX: [0,1,2, 0,1,2,0, 0,1,2,0, 0,1,2,0, 0,1,2,0],
+    frameY: [2,2,2, 3,3,3,4, 3,3,3,4, 3,3,3,4, 3,3,3,4],
+    delay: [2400,2200,2000, 1600,1600,1600,1600, 1600,1600,1600,1600, 1600,1600,1600,1600, 1600,1600,1600,1600]
   });
   girl.addAnimation({
     name: 'flash',
@@ -91,7 +91,7 @@ myGame.screens['game-play'] = (function(game) {
   });
 
   let dayCompleteText = Graphics.Text({
-    text : 'Day Complete',
+    text : 'Day 1 Complete',
     font : '16px Anton, Helvetica, sans-serif',
     fill : 'rgb(256, 256, 256)',
     stroke : 'rgb(256, 256, 256)',
@@ -153,8 +153,8 @@ myGame.screens['game-play'] = (function(game) {
       if(speed >= 10){
         speed += .1;
       }
-      if(speed > 30){
-        speed = 30;
+      if(speed > 35){
+        speed = 35;
       }
       for(var i=0; i<tiles.length; i++){
         //sand tiles
@@ -368,12 +368,14 @@ myGame.screens['game-play'] = (function(game) {
     speed = 0;
     newDay = true;
     newDayCount++;
-    if(newDayCount >= 100){
+    if(newDayCount >= 300){
+      day++;
+      dayCompleteText.setText('Day ' + day + ' Complete!');
+      targetDist += (100+(10*day));
       newDayCount = 0;
       newDay = false;
       speed = 30;
       darkness = 0;
-      targetDist += 50;
       sun.setPosition(32,32);
       for(var i=0; i<tiles[0].length; i++){
         tiles[1][i] = null;

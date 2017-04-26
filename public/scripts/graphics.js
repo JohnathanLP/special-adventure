@@ -295,65 +295,6 @@ let Graphics = (function(){
       return that;
   }
 
-  // function Text(spec) {
-	// 	let that = {};
-  //
-	// 	function measureTextHeight(spec) {
-	// 		context.save();
-  //
-	// 		context.font = spec.font;
-	// 		context.fillStyle = spec.fill;
-	// 		context.strokeStyle = spec.stroke;
-  //
-	// 		var height = context.measureText('m').width;
-  //
-	// 		context.restore();
-  //
-	// 		return height;
-	// 	}
-  //
-	//    function measureTextWidth(spec) {
-	// 		context.save();
-  //
-	// 		context.font = spec.font;
-	// 		context.fillStyle = spec.fill;
-	// 		context.strokeStyle = spec.stroke;
-  //
-	// 		var width = context.measureText(spec.text).width;
-  //
-	// 		context.restore();
-  //
-	// 		return width;
-	// 	}
-  //
-  //   that.setText = function(stringIn) {
-  //     spec.text = stringIn;
-  //   };
-  //
-	// 	that.draw = function() {
-	// 		context.save();
-  //
-	// 		context.font = spec.font;
-	// 		context.fillStyle = spec.fill;
-	// 		context.strokeStyle = spec.stroke;
-	// 		context.textBaseline = 'top';
-  //
-	// 		context.translate(spec.pos.x + that.width / 2, spec.pos.y + that.height / 2);
-	// 		context.translate(-(spec.pos.x + that.width / 2), -(spec.pos.y + that.height / 2));
-  //
-	// 		context.fillText(spec.text, spec.pos.x, spec.pos.y);
-	// 		context.strokeText(spec.text, spec.pos.x, spec.pos.y);
-  //
-	// 		context.restore();
-	// 	};
-  //
-	// 	that.height = measureTextHeight(spec);
-	// 	that.width = measureTextWidth(spec);
-	// 	that.pos = spec.pos;
-  //
-	// 	return that;
-	// }
-
   function Text(spec) {
 		var that = {};
 
@@ -416,9 +357,6 @@ let Graphics = (function(){
       spec.pos.y = 168-(measureTextHeight(spec)/2);
     };
 
-    //Makes public some info about the text, it was breaking things so I commented it out
-		//that.height = measureTextHeight(spec);
-		//that.width = measureTextWidth(spec);
 		that.pos = spec.pos;
 
 		return that;
