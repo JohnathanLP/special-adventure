@@ -268,7 +268,7 @@ myGame.screens['game-play'] = (function(game) {
         safeCount++;
       }
       if(safeCount == 19){
-        girl.setAnimation('run');
+        //girl.setAnimation('run');
       }
     }
   }
@@ -456,6 +456,14 @@ myGame.screens['game-play'] = (function(game) {
   	text = "Speed: " + Number(speed).toFixed(2);
   	document.getElementById('speedSpan').innerHTML = text;
 
+    var dayField = document.getElementById('daySpan').innerHTML;
+  	text = "Day: " + day;
+  	document.getElementById('daySpan').innerHTML = text;
+
+    var targetField = document.getElementById('targetSpan').innerHTML;
+  	text = "Target: " + targetDist;
+  	document.getElementById('targetSpan').innerHTML = text;
+
     terrH = getAltitude();
     if(distanceRun > targetDist){
       startNewDay();
@@ -496,42 +504,39 @@ myGame.screens['game-play'] = (function(game) {
     //cancelNextRequest = false;
     //distanceRun = 0;
     //gameOver = false;
-     speed = 30;
-     offset = 0;
-     background_offset = 0;
-     sandstorm_intensity = 1;
-     girlPosX = 32;
-     distanceRun = 0;
-     cancelNextRequest = false;
-     girlVel = {x:0,y:0};
-     onGround = true;
-     terrH = 96;
-     crashFlag = false;
-     safeFlag = true;
-     freeze = false;
-     day = 0;
-     dayTime = 0;
-     dayDur = 1000;
-     darkness = 0;
-     gameOver = false;
-     sandstorm.clearAll();
-     for(var i=0; i<tiles[0].length; i++){
-       tiles[1][i] = null;
-       tiles[2][i] = null;
-       tiles[3][i] = null;
-     }
-     girl.setPosition(girlPosX, 96);
-     girl.setAnimation('run');
+    speed = 30;
+    offset = 0;
+    background_offset = 0;
+    sandstorm_intensity = 1;
+    girlPosX = 32;
+    distanceRun = 0;
+    cancelNextRequest = false;
+    girlVel = {x:0,y:0};
+    onGround = true;
+    terrH = 96;
+    crashFlag = false;
+    safeFlag = true;
+    freeze = false;
+    day = 0;
+    dayTime = 0;
+    dayDur = 1000;
+    darkness = 0;
+    gameOver = false;
+    sandstorm.clearAll();
+    for(var i=0; i<tiles[0].length; i++){
+     tiles[1][i] = null;
+     tiles[2][i] = null;
+     tiles[3][i] = null;
+    }
+    girl.setPosition(girlPosX, 96);
+    girl.setAnimation('run');
     AudioPlayer.playSound('audio/desert');
 
     myKeyboard = Input.Keyboard();
     var keyBoardControls = Persistence.getControls();
     //console.log(keyBoardControls);
 
-    //TODO: Sun needs to reset
-    //This isn't doing the trick
     sun.setPosition(32, 32);
-    //console.log(sun.position);
 
     if(isEmpty(keyBoardControls)){
       Persistence.add(74);
